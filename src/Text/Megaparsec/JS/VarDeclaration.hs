@@ -13,9 +13,9 @@ import Control.Monad
 import Control.Monad.State
 
 
-varDeclaration :: Parser [Variable]
-varDeclaration = do
-    pstate@(ParserState { scopeLevel = slevel, scopePos = spos, currentFuncName = curFName}) <- get
+varDeclarationSimple :: Parser [Variable]
+varDeclarationSimple = do
+    pstate@(ParserState { variables = vars, scopeLevel = slevel, scopePos = spos, currentFuncName = curFName}) <- get
 
     declType <- S.lexeme (string "let" <|> string "var")
     varFirstLetter <- S.lexeme (upperChar <|> lowerChar)
@@ -23,5 +23,11 @@ varDeclaration = do
     let fullName = T.pack ([varFirstLetter] ++ varName)
     void $ S.lexeme (single ';')
     case declType of
-        "let" -> return [(LocalVar { varFunctionName = curFName, varName = fullName, varScopeLevel = slevel, varScopePos = spos})]
-        "var" -> return [(LocalVar { varFunctionName = curFName, varName = fullName, varScopeLevel = 1, varScopePos = spos})]
+        "let" -> do
+            let lvar = (LocalVar { varFunctionName = curFName, varName = fullName, varScopeLevel = slevel, varScopePos = spos})
+            put (pstate { variables = (lvar : vars) })
+            return [lvar]
+        "var" -> do
+            let lvar = (LocalVar { varFunctionName = curFName, varName = fullName, varScopeLevel = 1, varScopePos = spos})
+            put (pstate { variables = (lvar : vars) })
+            return [lvar]

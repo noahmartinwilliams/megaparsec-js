@@ -10,8 +10,8 @@ import Control.Monad.State
 test01 :: IO ()
 test01 = do
     let input = "let v;"
-        result = runParserT varDeclaration "" (T.pack input)
-        (result', _) = runState result (ParserState { scopeLevel = 1, scopePos = 0, currentFuncName = (T.pack "foo") })
+        result = runParserT varDeclarationSimple "" (T.pack input)
+        (result', _) = runState result (ParserState { variables = [], scopeLevel = 1, scopePos = 0, currentFuncName = (T.pack "foo") })
     if isRight result'
     then do
         let (Right result'') = result'

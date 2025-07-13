@@ -7,6 +7,6 @@ import Control.Monad.State as S
 
 type Parser = ParsecT Void Text (S.State ParserState) 
 
-data ParserState = ParserState { scopeLevel :: Int, scopePos :: Int, currentFuncName :: Text } deriving(Show, Eq)
+data ParserState = ParserState { variables :: [Variable], scopeLevel :: Int, scopePos :: Int, currentFuncName :: Text } deriving(Show, Eq)
 
 data Variable = GlobalVar Text | LocalVar { varFunctionName :: Text, varName :: Text, varScopeLevel :: Int, varScopePos :: Int} deriving(Show, Eq)
