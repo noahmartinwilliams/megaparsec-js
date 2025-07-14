@@ -60,8 +60,29 @@ test03 = do
     else
         let (Left err) = result2' in putStrLn (errorBundlePretty err)
 
+test04 :: IO ()
+test04 = do
+    let input = "let v;"
+        result = runParserT varDeclarationSimple "" (T.pack input)
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = (T.pack "foo") })
+        input2 = "v + 1"
+        result2 = runParserT jsExprBinOp "" (T.pack input2)
+        (result2', _) = runState result2 newState
+    if isRight result2'
+    then do
+        let (Right result2'') = result2'
+        let (BinOpExpr _ _ bop ) = result2''
+        if bop == AddBinOp
+        then
+            putStrLn ("Test 04 succeeded.")
+        else
+            putStrLn ("Test 04 failed.")
+    else
+        let (Left err) = result2' in putStrLn (errorBundlePretty err)
+
 main :: IO ()
 main = do
     test01
     test02
     test03
+    test04
