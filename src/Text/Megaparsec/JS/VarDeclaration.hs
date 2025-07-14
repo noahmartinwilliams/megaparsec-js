@@ -14,6 +14,32 @@ import Control.Monad.State
 import Data.Maybe
 import Data.Map
 
+lookupVar :: Text -> ParserState -> Variable
+lookupVar vname state@(ParserState { scopePath = sp, variables = vars, scopeLevel = sl, scopePos = spos, currentFuncName = cfn}) = do
+    let lookedup = Data.Map.lookup vname vars
+    if isNothing lookedup 
+    then
+        (UnknownVar vname) -- For variables that must have been imported from a library that we didn't get to see.
+    else
+        let (Just lookedup') = lookedup in getVarIntern lookedup' sp sl spos cfn where
+
+            getVarIntern :: [Variable] -> [Int] -> Int -> Int -> Text -> Variable
+            getVarIntern vlist spath slevel sposn cfn = do
+                let vlist' = Prelude.filter (\x -> isInFunction cfn x ) vlist
+                    [vlist''] = Prelude.filter (\x -> isInScope spath x) vlist'
+                vlist''
+
+
+            isInScope :: [Int] -> Variable -> Bool
+            isInScope slist (LocalVar { varPath = vpath }) = slist == vpath
+            isInScope _ (GlobalVar _) = True
+            isInScope _ (UnknownVar _) = True
+
+            isInFunction :: Text -> Variable -> Bool
+            isInFunction _ (UnknownVar _) = True
+            isInFunction _ (GlobalVar _) = True
+            isInFunction vfn' (LocalVar { varFunctionName = vfn }) | vfn == vfn' = True
+            isInFunction _ _ = False
 
 varDeclarationSimple :: Parser Statement
 varDeclarationSimple = do

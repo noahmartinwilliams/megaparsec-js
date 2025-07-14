@@ -10,7 +10,7 @@ type Parser = ParsecT Void Text (S.State ParserState)
 
 data ParserState = ParserState { scopePath :: [Int], variables :: Map Text [Variable], scopeLevel :: Int, scopePos :: Int, currentFuncName :: Text } deriving(Show, Eq)
 
-data Variable = GlobalVar Text | LocalVar { varPath :: [Int], varFunctionName :: Text, varName :: Text, varScopeLevel :: Int, varScopePos :: Int} deriving(Show, Eq)
+data Variable = UnknownVar Text | GlobalVar Text | LocalVar { varPath :: [Int], varFunctionName :: Text, varName :: Text, varScopeLevel :: Int, varScopePos :: Int} deriving(Show, Eq)
 
 data Expr = VarExpr Variable | IntExpr Int deriving(Show, Eq)
 
