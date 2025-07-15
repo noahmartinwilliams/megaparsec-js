@@ -80,9 +80,30 @@ test04 = do
     else
         let (Left err) = result2' in putStrLn (errorBundlePretty err)
 
+test05 :: IO ()
+test05 = do
+    let input = "let v;"
+        result = runParserT varDeclarationSimple "" (T.pack input)
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = (T.pack "foo") })
+        input2 = "v . mem"
+        result2 = runParserT jsMemAccExpr "" (T.pack input2)
+        (result2', _) = runState result2 newState
+    if isRight result2'
+    then do
+        let (Right result2'') = result2'
+        let (MemAccExpr e1 e2) = result2''
+        if e2 == (T.pack "mem")
+        then
+            putStrLn ("Test 05 succeeded.")
+        else
+            putStrLn ("Test 05 failed.")
+    else
+        let (Left err) = result2' in putStrLn (errorBundlePretty err)
+
 main :: IO ()
 main = do
     test01
     test02
     test03
     test04
+    test05

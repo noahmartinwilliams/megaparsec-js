@@ -7,6 +7,8 @@ import Text.Megaparsec.JS.Types
 import Text.Megaparsec.JS.VarDeclaration
 import Data.Text as T
 import Control.Monad.State
+import Data.Void
+import Control.Monad
 
 jsExprVar :: Parser Expr
 jsExprVar = do
@@ -29,8 +31,20 @@ binOp = do
         '+' -> return AddBinOp
         '-' -> return SubBinOp
 
-jsExpr :: Parser Expr
-jsExpr = (jsExprInt <|> jsExprVar)
+jsGroupingExpr :: Parser Expr
+jsGroupingExpr = do
+    void $ S.lexeme (single '(')
+    e <- S.lexeme (jsExpr)
+    void $ S.lexeme (single ')')
+    return e
+
+jsMemAccExpr :: Parser Expr
+jsMemAccExpr = do
+    e1 <- jsExpr
+    void $ S.lexeme (single '.')
+    e2 <- S.lexeme letterChar
+    e2' <- many alphaNumChar
+    return (MemAccExpr e1 (T.pack ([e2] ++ e2')))
 
 jsExprBinOp :: Parser Expr
 jsExprBinOp = do
@@ -38,3 +52,7 @@ jsExprBinOp = do
     bop <- binOp
     e2 <- jsExpr 
     return (BinOpExpr e1 e2 bop)
+
+jsExpr :: Parser Expr
+jsExpr = (jsExprInt <|> jsExprVar <|> jsGroupingExpr <|> jsMemAccExpr <|> jsExprBinOp )
+
