@@ -3,12 +3,13 @@ module Text.Megaparsec.JS.Expr where
 import Text.Megaparsec
 import Text.Megaparsec.JS.Space as S
 import Text.Megaparsec.Char
+import Text.Megaparsec.Char.Lexer
 import Text.Megaparsec.JS.Types
 import Text.Megaparsec.JS.VarDeclaration
 import Data.Text as T
 import Control.Monad.State
-import Data.Void
 import Control.Monad
+import Control.Monad.Combinators.Expr
 
 jsExprVar :: Parser Expr
 jsExprVar = do
@@ -21,38 +22,30 @@ jsExprVar = do
 
 jsExprInt :: Parser Expr
 jsExprInt = do
-    integer <- some digitChar
+    integer <- S.lexeme (some digitChar)
     return (IntExpr (read integer :: Int))
 
-binOp :: Parser BinOp
-binOp = do
-    op <- S.lexeme (single '+' <|> single '-')
-    case op of
-        '+' -> return AddBinOp
-        '-' -> return SubBinOp
+mkMulExpr :: Expr -> Expr -> Expr
+mkMulExpr e1 e2 = BinOpExpr e1 e2 MulBinOp
 
-jsGroupingExpr :: Parser Expr
-jsGroupingExpr = do
-    void $ S.lexeme (single '(')
-    e <- S.lexeme (jsExpr)
-    void $ S.lexeme (single ')')
-    return e
+mkDivExpr :: Expr -> Expr -> Expr
+mkDivExpr e1 e2 = BinOpExpr e1 e2 DivBinOp
 
-jsMemAccExpr :: Parser Expr
-jsMemAccExpr = do
-    e1 <- jsExpr
-    void $ S.lexeme (single '.')
-    e2 <- S.lexeme letterChar
-    e2' <- many alphaNumChar
-    return (MemAccExpr e1 (T.pack ([e2] ++ e2')))
+mkAddExpr :: Expr -> Expr -> Expr
+mkAddExpr e1 e2 = BinOpExpr e1 e2 AddBinOp
 
-jsExprBinOp :: Parser Expr
-jsExprBinOp = do
-    e1 <- jsExpr
-    bop <- binOp
-    e2 <- jsExpr 
-    return (BinOpExpr e1 e2 bop)
+mkSubExpr :: Expr -> Expr -> Expr
+mkSubExpr e1 e2 = BinOpExpr e1 e2 SubBinOp
+
+mkAssignExpr :: Expr -> Expr -> Expr
+mkAssignExpr e1 e2 = BinOpExpr e1 e2 AssignBinOp
+
+mkMemAccExpr :: Expr -> Expr -> Expr
+mkMemAccExpr e1 e2 = BinOpExpr e1 e2 MemAccBinOp
 
 jsExpr :: Parser Expr
-jsExpr = (jsExprInt <|> jsExprVar <|> jsGroupingExpr <|> jsMemAccExpr <|> jsExprBinOp )
-
+jsExpr = do
+    let binary name f = InfixL (f <$ symbol Text.Megaparsec.Char.space  (T.pack name))
+        table = [ [binary "=" mkAssignExpr], [binary "." mkMemAccExpr], [ binary "*" mkMulExpr, binary "/" mkDivExpr], [ binary "+" mkAddExpr, binary "-" mkSubExpr]]
+        term = (jsExprInt <|> jsExprVar) <?> "term"
+    makeExprParser (jsExprInt <|> jsExprVar) table <?> "expression"

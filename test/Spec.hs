@@ -66,7 +66,7 @@ test04 = do
         result = runParserT varDeclarationSimple "" (T.pack input)
         (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = (T.pack "foo") })
         input2 = "v + 1"
-        result2 = runParserT jsExprBinOp "" (T.pack input2)
+        result2 = runParserT jsExpr "" (T.pack input2)
         (result2', _) = runState result2 newState
     if isRight result2'
     then do
@@ -86,17 +86,57 @@ test05 = do
         result = runParserT varDeclarationSimple "" (T.pack input)
         (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = (T.pack "foo") })
         input2 = "v . mem"
-        result2 = runParserT jsMemAccExpr "" (T.pack input2)
+        result2 = runParserT jsExpr "" (T.pack input2)
         (result2', _) = runState result2 newState
     if isRight result2'
     then do
         let (Right result2'') = result2'
-        let (MemAccExpr e1 e2) = result2''
-        if e2 == (T.pack "mem")
+        let (BinOpExpr _ _ op) = result2''
+        if op == MemAccBinOp
         then
             putStrLn ("Test 05 succeeded.")
         else
             putStrLn ("Test 05 failed.")
+    else
+        let (Left err) = result2' in putStrLn (errorBundlePretty err)
+
+test06 :: IO ()
+test06 = do
+    let input = "let v;"
+        result = runParserT varDeclarationSimple "" (T.pack input)
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = (T.pack "foo") })
+        input2 = "v = v"
+        result2 = runParserT jsExpr "" (T.pack input2)
+        (result2', _) = runState result2 newState
+    if isRight result2'
+    then do
+        let (Right result2'') = result2'
+        let (BinOpExpr _ _ op) = result2''
+        if op == AssignBinOp
+        then
+            putStrLn ("Test 06 succeeded.")
+        else
+            putStrLn ("Test 06 failed.")
+    else
+        let (Left err) = result2' in putStrLn (errorBundlePretty err)
+
+test07 :: IO ()
+test07 = do
+    let input = "let v;"
+        result = runParserT varDeclarationSimple "" (T.pack input)
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = (T.pack "foo") })
+        input2 = "v = v * v + v"
+        result2 = runParserT jsExpr "" (T.pack input2)
+        (result2', _) = runState result2 newState
+    if isRight result2'
+    then do
+        let (Right result2'') = result2'
+        let (BinOpExpr _ _ op2) = result2''
+        if op2 == AddBinOp
+        then
+            putStrLn ("Test 07 succeeded.")
+        else
+            putStrLn ("Test 07 failed. Got: \"" ++ (show op2) ++ "\".")
     else
         let (Left err) = result2' in putStrLn (errorBundlePretty err)
 
@@ -107,3 +147,5 @@ main = do
     test03
     test04
     test05
+    test06
+    test07

@@ -12,8 +12,8 @@ data ParserState = ParserState { scopePath :: [Int], variables :: Map Text [Vari
 
 data Variable = UnknownVar Text | GlobalVar Text | LocalVar { varPath :: [Int], varFunctionName :: Text, varName :: Text, varScopeLevel :: Int, varScopePos :: Int} deriving(Show, Eq)
 
-data BinOp = AddBinOp | SubBinOp | MulBinOp | DivBinOp deriving(Show, Eq)
+data BinOp = MemAccBinOp | AssignBinOp | AddBinOp | SubBinOp | MulBinOp | DivBinOp deriving(Show, Eq)
 
-data Expr = MemAccExpr Expr Text | BinOpExpr Expr Expr BinOp | VarExpr Variable | IntExpr Int deriving(Show, Eq)
+data Expr = BinOpExpr Expr Expr BinOp | VarExpr Variable | IntExpr Int deriving(Show, Eq)
 
 data Statement = VarDeclare [(Variable, Maybe Expr)] deriving(Show, Eq)
