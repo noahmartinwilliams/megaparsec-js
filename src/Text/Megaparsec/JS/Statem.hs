@@ -15,3 +15,15 @@ jsReturnStatem = do
     e <- S.lexeme (jsExpr )
     void $ single ';'
     return (ReturnStatem e)
+
+jsWhileStatem :: Parser Statem
+jsWhileStatem = do
+    void $ S.lexeme (string (T.pack "while"))
+    void $ S.lexeme (single '(')
+    e <- S.lexeme (jsExpr)
+    void $ S.lexeme (single ')')
+    s <- S.lexeme (jsStatem )
+    return (WhileStatem e s)
+
+jsStatem :: Parser Statem 
+jsStatem = (jsWhileStatem <|> jsReturnStatem)

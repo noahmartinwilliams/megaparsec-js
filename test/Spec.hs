@@ -157,6 +157,22 @@ test08 = do
     else
         let (Left err) = result' in putStrLn (errorBundlePretty err)
 
+test09 :: IO ()
+test09 = do
+    let input = "while (1) return 1;"
+        result = runParserT jsStatem "" (T.pack input)
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = (T.pack "foo") })
+    if isRight result'
+    then do
+        let (Right result2) = result'
+        if (WhileStatem (IntExpr 1) (ReturnStatem (IntExpr 1))) == result2
+        then
+            putStrLn ("Test 09 succeeded.")
+        else
+            putStrLn ("Test 09 failed.")
+    else
+        let (Left err) = result' in putStrLn (errorBundlePretty err)
+
 main :: IO ()
 main = do
     test01
@@ -167,3 +183,4 @@ main = do
     test06
     test07
     test08
+    test09
