@@ -7,6 +7,7 @@ import Text.Megaparsec.JS.Space as S
 import Text.Megaparsec.JS.Types 
 import Data.Text as T
 import Control.Monad
+import Control.Monad.State
 import Text.Megaparsec.JS.Expr
 
 jsReturnStatem :: Parser Statem
@@ -25,5 +26,16 @@ jsWhileStatem = do
     s <- S.lexeme (jsStatem )
     return (WhileStatem e s)
 
+jsBlockStatem :: Parser Statem 
+jsBlockStatem = do
+    void $ S.lexeme (single '{')
+    pstate@(ParserState { scopePath = spath, scopeLevel = slevel, scopePos = spos}) <- get
+    put (pstate { scopePath = (spos : spath), scopeLevel = (slevel + 1), scopePos = (spos + 1)})
+    ss <- S.lexeme (many (S.lexeme jsStatem))
+    let folded = Prelude.foldr (BlockStatem) EmptyStatem ss
+    void $ S.lexeme (single '}')
+    put (pstate { scopePath = spath, scopeLevel = slevel})
+    return folded
+
 jsStatem :: Parser Statem 
-jsStatem = (jsWhileStatem <|> jsReturnStatem)
+jsStatem = (jsBlockStatem <|> jsWhileStatem <|> jsReturnStatem)
