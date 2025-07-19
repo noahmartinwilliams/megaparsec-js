@@ -8,6 +8,7 @@ import Data.Map
 import Text.Megaparsec.JS.VarDeclaration
 import Text.Megaparsec.JS.Types
 import Text.Megaparsec.JS.Expr
+import Text.Megaparsec.JS.Statem
 import Control.Monad.State
 
 test01 :: IO ()
@@ -18,7 +19,7 @@ test01 = do
     if isRight result'
     then do
         let (Right result'') = result'
-        let (VarDeclare [(LocalVar { varName = vname }, Nothing)]) = result''
+        let (VarDeclareStatem [(LocalVar { varName = vname }, Nothing)]) = result''
         if vname == (T.pack "v")
         then
             putStrLn ("Test 01 succeeded.")
@@ -140,6 +141,22 @@ test07 = do
     else
         let (Left err) = result2' in putStrLn (errorBundlePretty err)
 
+test08 :: IO ()
+test08 = do
+    let input = "return 1;"
+        result = runParserT jsReturnStatem "" (T.pack input)
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = (T.pack "foo") })
+    if isRight result'
+    then do
+        let (Right result2) = result'
+        if (ReturnStatem (IntExpr 1)) == result2
+        then
+            putStrLn ("Test 08 succeeded.")
+        else
+            putStrLn ("Test 08 failed.")
+    else
+        let (Left err) = result' in putStrLn (errorBundlePretty err)
+
 main :: IO ()
 main = do
     test01
@@ -149,3 +166,4 @@ main = do
     test05
     test06
     test07
+    test08

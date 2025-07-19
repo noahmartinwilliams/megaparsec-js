@@ -8,7 +8,6 @@ import Text.Megaparsec.JS.Types
 import Text.Megaparsec.JS.VarDeclaration
 import Data.Text as T
 import Control.Monad.State
-import Control.Monad
 import Control.Monad.Combinators.Expr
 
 jsExprVar :: Parser Expr
@@ -48,4 +47,4 @@ jsExpr = do
     let binary name f = InfixL (f <$ symbol Text.Megaparsec.Char.space  (T.pack name))
         table = [ [binary "=" mkAssignExpr], [binary "." mkMemAccExpr], [ binary "*" mkMulExpr, binary "/" mkDivExpr], [ binary "+" mkAddExpr, binary "-" mkSubExpr]]
         term = (jsExprInt <|> jsExprVar) <?> "term"
-    makeExprParser (jsExprInt <|> jsExprVar) table <?> "expression"
+    makeExprParser term table <?> "expression"

@@ -41,7 +41,7 @@ lookupVar vname state@(ParserState { scopePath = sp, variables = vars, scopeLeve
             isInFunction vfn' (LocalVar { varFunctionName = vfn }) | vfn == vfn' = True
             isInFunction _ _ = False
 
-varDeclarationSimple :: Parser Statement
+varDeclarationSimple :: Parser Statem
 varDeclarationSimple = do
     pstate@(ParserState { scopePath = sp, variables = vars, scopeLevel = slevel, scopePos = spos, currentFuncName = curFName}) <- get
 
@@ -57,11 +57,11 @@ varDeclarationSimple = do
         "let" -> do
             let lvar = (LocalVar { varPath = sp, varFunctionName = curFName, varName = fullName, varScopeLevel = slevel, varScopePos = spos})
             put (pstate { variables = (insertVar vars lvar ) })
-            return (VarDeclare [(lvar, Nothing)])
+            return (VarDeclareStatem [(lvar, Nothing)])
         "var" -> do
             let lvar = (LocalVar { varFunctionName = curFName, varName = fullName, varScopeLevel = 1, varScopePos = spos})
             put (pstate { variables = (insertVar vars lvar) })
-            return (VarDeclare [(lvar, Nothing)]) 
+            return (VarDeclareStatem [(lvar, Nothing)]) 
 
 insertVar :: Map Text [Variable] -> Variable -> Map Text [Variable]
 insertVar m variable@(LocalVar { varName = vname }) = do
