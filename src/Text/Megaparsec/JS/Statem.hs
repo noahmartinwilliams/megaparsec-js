@@ -10,12 +10,22 @@ import Control.Monad
 import Control.Monad.State
 import Text.Megaparsec.JS.Expr
 
-jsReturnStatem :: Parser Statem
-jsReturnStatem = do
+jsReturnStatem1 :: Parser Statem
+jsReturnStatem1 = do
     void $ S.lexeme (string (T.pack "return"))
     e <- S.lexeme (jsExpr )
-    void $ single ';'
+    void $ lookAhead (single '}')
     return (ReturnStatem e)
+
+jsReturnStatem2 :: Parser Statem
+jsReturnStatem2 = do
+    void $ S.lexeme (string (T.pack "return"))
+    e <- S.lexeme (jsExpr )
+    void $ (single ';')
+    return (ReturnStatem e)
+
+jsReturnStatem :: Parser Statem
+jsReturnStatem = try (jsReturnStatem2 <|> jsReturnStatem1 )
 
 jsWhileStatem :: Parser Statem
 jsWhileStatem = do
