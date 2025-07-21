@@ -17,3 +17,5 @@ data BinOp = MemAccBinOp | AssignBinOp | AddBinOp | SubBinOp | MulBinOp | DivBin
 data Expr = BinOpExpr Expr Expr BinOp | VarExpr Variable | IntExpr Int deriving(Show, Eq)
 
 data Statem = IfStatem Expr Statem | EmptyStatem | BlockStatem Statem Statem | WhileStatem Expr Statem | ReturnStatem Expr | VarDeclareStatem [(Variable, Maybe Expr)] deriving(Show, Eq)
+
+data Function = Function Text [Variable] Statem  deriving(Show, Eq)

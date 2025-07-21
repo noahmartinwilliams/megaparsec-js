@@ -58,3 +58,8 @@ jsIfStatem = do
 
 jsStatem :: Parser Statem 
 jsStatem = (jsIfStatem <|> jsBlockStatem <|> jsWhileStatem <|> jsReturnStatem)
+
+jsStatems :: Parser Statem
+jsStatems = do
+    ss <- some (S.lexeme jsStatem)
+    return (Prelude.foldr BlockStatem EmptyStatem ss)

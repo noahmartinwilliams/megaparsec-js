@@ -9,6 +9,7 @@ import Text.Megaparsec.JS.VarDeclaration
 import Text.Megaparsec.JS.Types
 import Text.Megaparsec.JS.Expr
 import Text.Megaparsec.JS.Statem
+import Text.Megaparsec.JS.Func
 import Control.Monad.State
 
 test01 :: IO ()
@@ -205,6 +206,37 @@ test11 = do
     else
         let (Left err) = result' in putStrLn (errorBundlePretty err)
 
+test12 :: IO ()
+test12 = do
+    let input = "function myFunc(a, b) { return a + b ; }"
+        result = runParserT jsFunc "" (T.pack input)
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = (T.pack "") })
+    if isRight result'
+    then do
+        let (Right (Function fname _ _)) = result'
+        if fname == (T.pack "myFunc")
+        then
+            putStrLn ("Test 12 succeeded.")
+        else
+            putStrLn ("Test 12 failed.")
+    else
+        let (Left err) = result' in putStrLn (errorBundlePretty err)
+
+test13 :: IO ()
+test13 = do
+    let input = "function myFunc(a, b) { return a + b ; }"
+        result = runParserT jsFunc "" (T.pack input)
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = (T.pack "") })
+    if isRight result'
+    then do
+        let (Right (Function _ vars _)) = result'
+        if (vars !! 0) == LocalVar { varPath = [1, 1], varFunctionName = (T.pack "myFunc"), varName = (T.pack "a"), varScopeLevel = 1, varScopePos = 1}
+        then
+            putStrLn ("Test 13 succeeded.")
+        else
+            putStrLn ("Test 13 failed. Got : " ++ (show vars))
+    else
+        let (Left err) = result' in putStrLn (errorBundlePretty err)
 main :: IO ()
 main = do
     test01
@@ -218,3 +250,5 @@ main = do
     test09
     test10
     test11
+    test12
+    test13
