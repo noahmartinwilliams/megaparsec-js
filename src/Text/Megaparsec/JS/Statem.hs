@@ -47,5 +47,14 @@ jsBlockStatem = do
     put (pstate { scopePath = spath, scopeLevel = slevel})
     return folded
 
+jsIfStatem :: Parser Statem
+jsIfStatem = do
+    void $ S.lexeme (string (T.pack "if"))
+    void $ S.lexeme (single '(')
+    e <- S.lexeme (jsExpr)
+    void $ S.lexeme (single ')' )
+    s <- S.lexeme (jsStatem)
+    return (IfStatem e s)
+
 jsStatem :: Parser Statem 
-jsStatem = (jsBlockStatem <|> jsWhileStatem <|> jsReturnStatem)
+jsStatem = (jsIfStatem <|> jsBlockStatem <|> jsWhileStatem <|> jsReturnStatem)
