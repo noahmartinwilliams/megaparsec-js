@@ -237,6 +237,22 @@ test13 = do
             putStrLn ("Test 13 failed. Got : " ++ (show vars))
     else
         let (Left err) = result' in putStrLn (errorBundlePretty err)
+
+test14 :: IO ()
+test14 = do
+    let input = "func(1, 2)"
+        result = runParserT jsExpr "" (T.pack input)
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = (T.pack "") })
+    if isRight result'
+    then do
+        let (Right (FuncCallExpr _ args)) = result'
+        if (args !! 0) == (IntExpr 1)
+        then
+            putStrLn ("Test 14 succeeded.")
+        else
+            putStrLn ("Test 14 failed.")
+    else
+        let (Left err) = result' in putStrLn (errorBundlePretty err)
 main :: IO ()
 main = do
     test01
@@ -252,3 +268,4 @@ main = do
     test11
     test12
     test13
+    test14

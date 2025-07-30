@@ -42,9 +42,18 @@ mkAssignExpr e1 e2 = BinOpExpr e1 e2 AssignBinOp
 mkMemAccExpr :: Expr -> Expr -> Expr
 mkMemAccExpr e1 e2 = BinOpExpr e1 e2 MemAccBinOp
 
+parens :: Parser a -> Parser a
+parens = between (string (T.pack "(")) (string (T.pack ")"))
+
+funcCallExpr :: Parser (Expr -> Expr)
+funcCallExpr = do
+    args <- parens (jsExpr `sepBy` (S.lexeme (string (T.pack ","))))
+    return (`FuncCallExpr` args)
+
 jsExpr :: Parser Expr
 jsExpr = do
     let binary name f = InfixL (f <$ symbol Text.Megaparsec.Char.space  (T.pack name))
-        table = [ [binary "=" mkAssignExpr], [binary "." mkMemAccExpr], [ binary "*" mkMulExpr, binary "/" mkDivExpr], [ binary "+" mkAddExpr, binary "-" mkSubExpr]]
-        term = (jsExprInt <|> jsExprVar) <?> "term"
+        postfix p = Postfix p
+        table = [ [postfix funcCallExpr ], [binary "=" mkAssignExpr], [binary "." mkMemAccExpr], [ binary "*" mkMulExpr, binary "/" mkDivExpr], [ binary "+" mkAddExpr, binary "-" mkSubExpr]]
+        term = (jsExprInt <|> jsExprVar <|> parens jsExpr) <?> "term"
     makeExprParser term table <?> "expression"
