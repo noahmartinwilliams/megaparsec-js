@@ -15,11 +15,11 @@ jsFunc = do
     pstate@(ParserState { scopePath = spath, variables = vars, scopeLevel = slevel, scopePos = spos}) <- get
     void $ S.lexeme (string (T.pack "function"))
     f <- S.lexeme (letterChar)
-    restName <- some (alphaNumChar)
+    restName <- many (alphaNumChar)
     let funcName = T.pack ([f] ++ restName)
     put (pstate { currentFuncName = funcName } )
     void $ S.lexeme (single '(')
-    args <- jsArgList
+    args <- (try (jsArgList <|> jsArg1))
     void $ S.lexeme (single ')')
     let newMapList = Prelude.zip (Prelude.map (\(LocalVar { varName = v}) -> v) args) (Prelude.map (\x -> [x]) args)
         newMap = M.fromList newMapList
@@ -30,6 +30,9 @@ jsFunc = do
     put (pstate { currentFuncName = (T.pack ""), scopePath = spath, variables = vars, scopeLevel = 0})
     return (Function funcName args s)
 
+
+jsArg1 :: Parser [Variable]
+jsArg1 = some jsArg
 
 jsArgList :: Parser [Variable]
 jsArgList = sepBy jsArg (S.lexeme (single ','))

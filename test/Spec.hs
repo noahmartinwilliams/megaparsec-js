@@ -1,16 +1,17 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
 
-import Text.Megaparsec
+import Control.Monad.State
 import Data.Text as T
 import Data.Either
 import Data.Map
-import Text.Megaparsec.JS.VarDeclaration
-import Text.Megaparsec.JS.Types
+import Text.Megaparsec
+import Text.Megaparsec.JS.Doc
 import Text.Megaparsec.JS.Expr
-import Text.Megaparsec.JS.Statem
 import Text.Megaparsec.JS.Func
-import Control.Monad.State
+import Text.Megaparsec.JS.Statem
+import Text.Megaparsec.JS.Types
+import Text.Megaparsec.JS.VarDeclaration
 
 test01 :: IO ()
 test01 = do
@@ -253,6 +254,23 @@ test14 = do
             putStrLn ("Test 14 failed.")
     else
         let (Left err) = result' in putStrLn (errorBundlePretty err)
+
+test15 :: IO ()
+test15 = do
+    let input = "function f(a) { return a + 1; } var v ;"
+        result = runParserT jsDoc "" (T.pack input)
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = (T.pack "") })
+    if isRight result'
+    then do
+        let (Right (Doc syms)) = result'
+        if (Prelude.length syms) == 2
+        then
+            putStrLn ("Test 15 succeeded.")
+        else
+            putStrLn ("Test 15 failed.")
+    else
+        let (Left err) = result' in putStrLn (errorBundlePretty err)
+
 main :: IO ()
 main = do
     test01
@@ -269,3 +287,4 @@ main = do
     test12
     test13
     test14
+    test15

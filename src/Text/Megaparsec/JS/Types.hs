@@ -19,3 +19,5 @@ data Expr = FuncCallExpr Expr [Expr] | BinOpExpr Expr Expr BinOp | VarExpr Varia
 data Statem = IfStatem Expr Statem | EmptyStatem | BlockStatem Statem Statem | WhileStatem Expr Statem | ReturnStatem Expr | VarDeclareStatem [(Variable, Maybe Expr)] deriving(Show, Eq)
 
 data Function = Function Text [Variable] Statem  deriving(Show, Eq)
+
+data Doc = Doc [Either Function [(Variable, Maybe Expr)]] deriving(Show, Eq)
