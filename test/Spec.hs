@@ -214,7 +214,7 @@ test12 = do
         (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = (T.pack "") })
     if isRight result'
     then do
-        let (Right (Function fname _ _)) = result'
+        let (Right (Funct fname _ _)) = result'
         if fname == (T.pack "myFunc")
         then
             putStrLn ("Test 12 succeeded.")
@@ -230,7 +230,7 @@ test13 = do
         (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = (T.pack "") })
     if isRight result'
     then do
-        let (Right (Function _ vars _)) = result'
+        let (Right (Funct _ vars _)) = result'
         if (vars !! 0) == LocalVar { varPath = [1, 1], varFunctionName = (T.pack "myFunc"), varName = (T.pack "a"), varScopeLevel = 1, varScopePos = 1}
         then
             putStrLn ("Test 13 succeeded.")
@@ -262,7 +262,7 @@ test15 = do
         (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = (T.pack "") })
     if isRight result'
     then do
-        let (Right (Doc syms)) = result'
+        let (Right ((Doc syms), _)) = result'
         if (Prelude.length syms) == 2
         then
             putStrLn ("Test 15 succeeded.")

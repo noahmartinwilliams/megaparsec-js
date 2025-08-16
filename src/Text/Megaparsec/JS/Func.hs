@@ -10,7 +10,7 @@ import Text.Megaparsec.JS.Types
 import Text.Megaparsec.JS.Statem
 import Text.Megaparsec.JS.Space as S
 
-jsFunc :: Parser Function
+jsFunc :: Parser Funct
 jsFunc = do
     pstate@(ParserState { scopePath = spath, variables = vars, scopeLevel = slevel, scopePos = spos}) <- get
     void $ S.lexeme (string (T.pack "function"))
@@ -28,7 +28,7 @@ jsFunc = do
     s <- jsStatems
     void $ S.lexeme (single '}')
     put (pstate { currentFuncName = (T.pack ""), scopePath = spath, variables = vars, scopeLevel = 0})
-    return (Function funcName args s)
+    return (Funct funcName args s)
 
 
 jsArg1 :: Parser [Variable]
