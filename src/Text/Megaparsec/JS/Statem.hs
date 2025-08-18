@@ -36,7 +36,15 @@ jsWhileStatem = do
     s <- S.lexeme (jsStatem )
     return (WhileStatem e s)
 
-jsBlockStatem :: Parser Statem 
+jsIfStatem :: Parser Statem
+jsIfStatem = do
+    void $ S.lexeme (string (T.pack "if"))
+    void $ S.lexeme (single '(')
+    e <- S.lexeme (jsExpr)
+    void $ S.lexeme (single ')' )
+    s <- S.lexeme (jsStatem)
+    return (IfStatem e s)
+
 jsBlockStatem = do
     void $ S.lexeme (single '{')
     pstate@(ParserState { scopePath = spath, scopeLevel = slevel, scopePos = spos}) <- get
@@ -47,19 +55,8 @@ jsBlockStatem = do
     put (pstate { scopePath = spath, scopeLevel = slevel})
     return folded
 
-jsIfStatem :: Parser Statem
-jsIfStatem = do
-    void $ S.lexeme (string (T.pack "if"))
-    void $ S.lexeme (single '(')
-    e <- S.lexeme (jsExpr)
-    void $ S.lexeme (single ')' )
-    s <- S.lexeme (jsStatem)
-    return (IfStatem e s)
-
-jsStatem :: Parser Statem 
-jsStatem = (jsIfStatem <|> jsBlockStatem <|> jsWhileStatem <|> jsReturnStatem)
-
-jsStatems :: Parser Statem
 jsStatems = do
     ss <- some (S.lexeme jsStatem)
     return (Prelude.foldr BlockStatem EmptyStatem ss)
+
+jsStatem = (jsIfStatem <|> jsBlockStatem <|> jsWhileStatem <|> jsReturnStatem)

@@ -14,7 +14,7 @@ data Variable = UnknownVar Text | GlobalVar Text | LocalVar { varPath :: [Int], 
 
 data BinOp = MemAccBinOp | AssignBinOp | AddBinOp | SubBinOp | MulBinOp | DivBinOp deriving(Show, Eq)
 
-data Expr = FuncCallExpr Expr [Expr] | BinOpExpr Expr Expr BinOp | VarExpr Variable | IntExpr Int deriving(Show, Eq)
+data Expr = AnonFuncExpr [Variable] Statem | FuncCallExpr Expr [Expr] | BinOpExpr Expr Expr BinOp | VarExpr Variable | IntExpr Int deriving(Show, Eq)
 
 data Statem = IfStatem Expr Statem | EmptyStatem | BlockStatem Statem Statem | WhileStatem Expr Statem | ReturnStatem Expr | VarDeclareStatem [(Variable, Maybe Expr)] deriving(Show, Eq)
 

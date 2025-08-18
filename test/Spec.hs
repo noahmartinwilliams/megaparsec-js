@@ -271,6 +271,21 @@ test15 = do
     else
         let (Left err) = result' in putStrLn (errorBundlePretty err)
 
+test16 :: IO ()
+test16 = do
+    let input = "function f(a) { return function(b) { return a + b; } ; }  var v ;"
+        result = runParserT jsDoc "" (T.pack input)
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = (T.pack "") })
+    if isRight result'
+    then do
+        let (Right ((Doc syms), _)) = result'
+        if (Prelude.length syms) == 2
+        then
+            putStrLn ("Test 16 succeeded.")
+        else
+            putStrLn ("Test 16 failed.")
+    else
+        let (Left err) = result' in putStrLn (errorBundlePretty err)
 main :: IO ()
 main = do
     test01
@@ -288,3 +303,4 @@ main = do
     test13
     test14
     test15
+    test16

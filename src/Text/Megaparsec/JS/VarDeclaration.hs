@@ -6,6 +6,7 @@ import Data.Text as T
 import Text.Megaparsec.JS.Types
 import Control.Monad.State
 import Text.Megaparsec.JS.Space as S
+import Text.Megaparsec.JS.Ident
 import Data.Void
 import Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
@@ -46,10 +47,7 @@ varDeclarationSimple = do
     pstate@(ParserState { scopePath = sp, variables = vars, scopeLevel = slevel, scopePos = spos, currentFuncName = curFName}) <- get
 
     declType <- S.lexeme (string "let" <|> string "var")
-    varFirstLetter <- S.lexeme (upperChar <|> lowerChar)
-    varName <- S.lexeme (many alphaNumChar)
-
-    let fullName = T.pack ([varFirstLetter] ++ varName)
+    fullName <- jsIdent
     
     void $ S.lexeme (single ';')
 

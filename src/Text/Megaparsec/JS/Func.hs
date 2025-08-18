@@ -6,9 +6,10 @@ import Data.Map as M
 import Data.Text as T
 import Text.Megaparsec
 import Text.Megaparsec.Char
-import Text.Megaparsec.JS.Types
-import Text.Megaparsec.JS.Statem
 import Text.Megaparsec.JS.Space as S
+import Text.Megaparsec.JS.Statem
+import Text.Megaparsec.JS.Types
+import Text.Megaparsec.JS.Ident
 
 jsFunc :: Parser Funct
 jsFunc = do
@@ -30,16 +31,11 @@ jsFunc = do
     put (pstate { currentFuncName = (T.pack ""), scopePath = spath, variables = vars, scopeLevel = 0})
     return (Funct funcName args s)
 
-
-jsArg1 :: Parser [Variable]
 jsArg1 = some jsArg
 
-jsArgList :: Parser [Variable]
 jsArgList = sepBy jsArg (S.lexeme (single ','))
 
-jsArg :: Parser Variable
 jsArg = do
     (ParserState { scopePath = spath, scopeLevel = slevel, scopePos = spos, currentFuncName = cfn }) <- get
-    f <- S.lexeme letterChar
-    frest <- many alphaNumChar
-    return (LocalVar { varPath = ((spos + 1) : spath), varFunctionName = cfn, varName = (T.pack ([f] ++ frest)), varScopeLevel = (slevel + 1), varScopePos = (spos + 1) })
+    ident <- jsIdent
+    return (LocalVar { varPath = ((spos + 1) : spath), varFunctionName = cfn, varName = ident, varScopeLevel = (slevel + 1), varScopePos = (spos + 1) })
