@@ -1,0 +1,70 @@
+cabal-version: 2.2
+
+-- This file has been generated from package.yaml by hpack version 0.38.0.
+--
+-- see: https://github.com/sol/hpack
+
+name:           megaparsec-js
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/noahmartinwilliams/megaparsec-js#readme>
+homepage:       https://github.com/noahmartinwilliams/megaparsec-js#readme
+bug-reports:    https://github.com/noahmartinwilliams/megaparsec-js/issues
+author:         Noah Martin Williams
+maintainer:     noahmartinwilliams@gmail.com
+copyright:      GPL
+license:        BSD-3-Clause
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    CHANGELOG.md
+
+source-repository head
+  type: git
+  location: https://github.com/noahmartinwilliams/megaparsec-js
+
+library
+  exposed-modules:
+      Text.Megaparsec.JS
+      Text.Megaparsec.JS.Doc
+      Text.Megaparsec.JS.Expr
+      Text.Megaparsec.JS.Func
+      Text.Megaparsec.JS.Ident
+      Text.Megaparsec.JS.Space
+      Text.Megaparsec.JS.Statem
+      Text.Megaparsec.JS.Types
+      Text.Megaparsec.JS.VarDeclaration
+  other-modules:
+      Paths_megaparsec_js
+  autogen-modules:
+      Paths_megaparsec_js
+  hs-source-dirs:
+      src
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+  build-depends:
+      base >=4.7 && <5
+    , containers
+    , megaparsec
+    , mtl
+    , parser-combinators
+    , text
+  default-language: Haskell2010
+
+test-suite megaparsec-js-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_megaparsec_js
+  autogen-modules:
+      Paths_megaparsec_js
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , containers
+    , megaparsec
+    , megaparsec-js
+    , mtl
+    , text
+  default-language: Haskell2010
