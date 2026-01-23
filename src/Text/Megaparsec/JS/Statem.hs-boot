@@ -1,14 +1,13 @@
 module Text.Megaparsec.JS.Statem where
 
 import Text.Megaparsec
-import Text.Megaparsec.JS.Space
 import Text.Megaparsec.JS.Types
 import Data.Void
 import Control.Monad
 import Control.Monad.State
 
-jsBlockStatem :: Parser Statem 
+jsBlockStatem :: JSParser Statem 
 
-jsStatem :: Parser Statem 
+jsStatem :: JSParser Statem 
 
-jsStatems :: Parser Statem
+jsStatems :: JSParser Statem

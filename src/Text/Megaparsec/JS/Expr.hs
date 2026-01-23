@@ -2,7 +2,6 @@ module Text.Megaparsec.JS.Expr where
 
 import Text.Megaparsec.JS.Ident
 import Text.Megaparsec
-import Text.Megaparsec.JS.Space as S
 import Text.Megaparsec.Char
 import Text.Megaparsec.Char.Lexer
 import Text.Megaparsec.JS.Types
@@ -15,16 +14,18 @@ import {-# SOURCE #-} Text.Megaparsec.JS.Statem
 import {-# SOURCE #-} Text.Megaparsec.JS.Func
 import Data.Void
 
-jsExprVar :: Parser Expr
+jsExprVar :: JSParser Expr
 jsExprVar = do
     stateVar <- get
     name <- jsIdent
     let varLookedUp = lookupVar name stateVar
     return (VarExpr varLookedUp)
 
-jsExprInt :: Parser Expr
+jsExprInt :: JSParser Expr
 jsExprInt = do
-    integer <- S.lexeme (some digitChar)
+    void $ hspace
+    integer <- (some digitChar)
+    void $ hspace
     return (IntExpr (read integer :: Int))
 
 mkMulExpr :: Expr -> Expr -> Expr
@@ -45,33 +46,45 @@ mkAssignExpr e1 e2 = BinOpExpr e1 e2 AssignBinOp
 mkMemAccExpr :: Expr -> Expr -> Expr
 mkMemAccExpr e1 e2 = BinOpExpr e1 e2 MemAccBinOp
 
-parens :: Parser a -> Parser a
-parens = between (string (T.pack "(")) (string (T.pack ")"))
+parens :: JSParser a -> JSParser a
+parens = between (string "(") (string ")")
 
-funcCallExpr :: Parser (Expr -> Expr)
+comma :: JSParser ()
+comma = do
+    void $ single ','
+    void $ hspace
+    return ()
+
+funcCallExpr :: JSParser (Expr -> Expr)
 funcCallExpr = do
-    args <- parens (jsExpr `sepBy` (S.lexeme (string (T.pack ","))))
+    args <- parens (jsExpr `sepBy` comma)
     return (`FuncCallExpr` args)
 
-jsAnonFuncExpr :: Parser Expr 
+jsAnonFuncExpr :: JSParser Expr 
 jsAnonFuncExpr = do
-    void $ S.lexeme (string (T.pack "function"))
+    void $ hspace
+    void $ (string "function")
+    void $ hspace1
     notFollowedBy jsIdent
-    void $ S.lexeme (single '(')
-    args <- S.lexeme (jsArg1)
-    void $ S.lexeme (single ')')
+    void $ (single '(')
+    void $ hspace
+    args <- (jsArg1)
+    void $ hspace
+    void $ (single ')')
+    void $ hspace
     statems <- jsBlockStatem
+    void $ hspace
     return (AnonFuncExpr args statems)
 
-jsExprOp :: Parser Expr
+jsExprOp :: JSParser Expr
 jsExprOp = do
-    let binary name f = InfixL (f <$ symbol Text.Megaparsec.Char.space  (T.pack name))
+    let binary name f = InfixL (f <$ symbol Text.Megaparsec.Char.space name)
         postfix p = Postfix p
         table = [ [postfix funcCallExpr ], [binary "=" mkAssignExpr], [binary "." mkMemAccExpr], [ binary "*" mkMulExpr, binary "/" mkDivExpr], [ binary "+" mkAddExpr, binary "-" mkSubExpr]]
         term = (jsExprInt <|> jsExprVar <|> parens jsExpr) <?> "term"
     makeExprParser term table <?> "expression"
 
-jsExpr :: Parser Expr 
+jsExpr :: JSParser Expr 
 jsExpr = do
     e <- try (jsAnonFuncExpr <|> jsExprOp)
     return e

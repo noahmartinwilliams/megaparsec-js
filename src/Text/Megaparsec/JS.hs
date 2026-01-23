@@ -10,4 +10,4 @@ import Text.Megaparsec.JS.Doc
 import Text.Megaparsec.JS.Types
 
 jsInitialState :: ParserState
-jsInitialState = ParserState { scopePath = [0], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = (T.pack "") }
+jsInitialState = ParserState { scopePath = [0], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = "" }

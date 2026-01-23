@@ -2,10 +2,8 @@
 module Text.Megaparsec.JS.VarDeclaration where
 
 import Text.Megaparsec
-import Data.Text as T
 import Text.Megaparsec.JS.Types
 import Control.Monad.State
-import Text.Megaparsec.JS.Space as S
 import Text.Megaparsec.JS.Ident
 import Data.Void
 import Text.Megaparsec.Char
@@ -15,7 +13,7 @@ import Control.Monad.State
 import Data.Maybe
 import Data.Map
 
-lookupVar :: Text -> ParserState -> Variable
+lookupVar :: String -> ParserState -> Variable
 lookupVar vname state@(ParserState { scopePath = sp, variables = vars, scopeLevel = sl, scopePos = spos, currentFuncName = cfn}) = do
     let lookedup = Data.Map.lookup vname vars
     if isNothing lookedup 
@@ -24,7 +22,7 @@ lookupVar vname state@(ParserState { scopePath = sp, variables = vars, scopeLeve
     else
         let (Just lookedup') = lookedup in getVarIntern lookedup' sp sl spos cfn where
 
-            getVarIntern :: [Variable] -> [Int] -> Int -> Int -> Text -> Variable
+            getVarIntern :: [Variable] -> [Int] -> Int -> Int -> String -> Variable
             getVarIntern vlist spath slevel sposn cfn = do
                 let vlist' = Prelude.filter (\x -> isInFunction cfn x ) vlist
                     [vlist''] = Prelude.filter (\x -> isInScope spath x) vlist'
@@ -36,20 +34,23 @@ lookupVar vname state@(ParserState { scopePath = sp, variables = vars, scopeLeve
             isInScope _ (GlobalVar _) = True
             isInScope _ (UnknownVar _) = True
 
-            isInFunction :: Text -> Variable -> Bool
+            isInFunction :: String -> Variable -> Bool
             isInFunction _ (UnknownVar _) = True
             isInFunction _ (GlobalVar _) = True
             isInFunction vfn' (LocalVar { varFunctionName = vfn }) | vfn == vfn' = True
             isInFunction _ _ = False
 
-varDeclarationSimple :: Parser Statem
+varDeclarationSimple :: JSParser Statem
 varDeclarationSimple = do
     pstate@(ParserState { scopePath = sp, variables = vars, scopeLevel = slevel, scopePos = spos, currentFuncName = curFName}) <- get
 
-    declType <- S.lexeme (string "let" <|> string "var")
+    declType <- (string "let" <|> string "var")
+    void $ hspace1
     fullName <- jsIdent
+    void $ hspace
     
-    void $ S.lexeme (single ';')
+    void $ (single ';')
+    void $ hspace
 
     case declType of
         "let" -> do
@@ -61,7 +62,7 @@ varDeclarationSimple = do
             put (pstate { variables = (insertVar vars lvar) })
             return (VarDeclareStatem [(lvar, Nothing)]) 
 
-insertVar :: Map Text [Variable] -> Variable -> Map Text [Variable]
+insertVar :: Map String [Variable] -> Variable -> Map String [Variable]
 insertVar m variable@(LocalVar { varName = vname }) = do
     let lu = Data.Map.lookup vname m 
     if isNothing lu
