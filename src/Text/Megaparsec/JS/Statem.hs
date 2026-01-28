@@ -12,24 +12,16 @@ import Text.Megaparsec.JS.Expr
 
 jsReturnStatem1 :: JSParser Statem
 jsReturnStatem1 = do
-    void $ scn
-    void $ (string "return")
-    void $ scn1
-    e <- (jsExpr )
-    void $ scn
-    void $ lookAhead (single '}')
-    void $ scn
+    void $ scn1 (string "return")
+    e <- scn (jsExpr )
+    void $ scn (lookAhead (single '}'))
     return (ReturnStatem e)
 
 jsReturnStatem2 :: JSParser Statem
 jsReturnStatem2 = do
-    void $ scn
-    void $ (string "return")
-    void $ scn1
-    e <- (jsExpr )
-    void $ scn
-    void $ (single ';')
-    void $ scn
+    void $ scn1 (string "return")
+    e <- scn (jsExpr )
+    void $ scn (single ';')
     return (ReturnStatem e)
 
 jsReturnStatem :: JSParser Statem
@@ -37,44 +29,29 @@ jsReturnStatem = try (jsReturnStatem2 <|> jsReturnStatem1 )
 
 jsWhileStatem :: JSParser Statem
 jsWhileStatem = do
-    void $ scn
-    void $ (string "while")
-    void $ scn
-    void $ (single '(')
-    void $ scn
-    e <- (jsExpr)
-    void $ scn
-    void $ (single ')')
-    void $ scn
-    s <- (jsStatem )
-    void $ scn
+    void $ scn (string "while")
+    void $ scn (single '(')
+    e <- scn (jsExpr)
+    void $ scn (single ')')
+    s <- scn (jsStatem )
     return (WhileStatem e s)
 
 jsIfStatem :: JSParser Statem
 jsIfStatem = do
-    void $ scn
-    void $ (string "if")
-    void $ scn
-    void $ (single '(')
-    void $ scn
-    e <- (jsExpr)
-    void $ scn
-    void $ (single ')' )
-    void $ scn
-    s <- (jsStatem)
-    void $ scn
+    void $ scn (string "if")
+    void $ scn (single '(')
+    e <- scn (jsExpr)
+    void $ scn (single ')' )
+    s <- scn (jsStatem)
     return (IfStatem e s)
 
 jsBlockStatem = do
-    void $ scn
-    void $ (single '{')
+    void $ scn (single '{')
     pstate@(ParserState { scopePath = spath, scopeLevel = slevel, scopePos = spos}) <- get
     put (pstate { scopePath = (spos : spath), scopeLevel = (slevel + 1), scopePos = (spos + 1)})
-    ss <- (many jsStatem)
-    void $ scn
+    ss <- scn (many jsStatem)
     let folded = Prelude.foldr (BlockStatem) EmptyStatem ss
-    void $ (single '}')
-    void $ scn
+    void $ scn (single '}')
     put (pstate { scopePath = spath, scopeLevel = slevel})
     return folded
 

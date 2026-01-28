@@ -16,7 +16,6 @@ keywords = do
 
 ident :: JSParser String
 ident = do
-    void $ hspace
     fchar <- letterChar
     rest <- many (alphaNumChar <|> (single '_'))
     return ([fchar] ++ rest)

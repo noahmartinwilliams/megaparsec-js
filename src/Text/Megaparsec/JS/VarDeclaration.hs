@@ -45,13 +45,10 @@ varDeclarationSimple :: JSParser Statem
 varDeclarationSimple = do
     pstate@(ParserState { scopePath = sp, variables = vars, scopeLevel = slevel, scopePos = spos, currentFuncName = curFName}) <- get
 
-    declType <- (string "let" <|> string "var")
-    void $ scn1
-    fullName <- jsIdent
-    void $ scn1
+    declType <- scn1 (string "let" <|> string "var")
+    fullName <- scn1 jsIdent
     
-    void $ (single ';')
-    void $ scn
+    void $ scn (single ';')
 
     case declType of
         "let" -> do

@@ -32,6 +32,7 @@ library
       Text.Megaparsec.JS.Ident
       Text.Megaparsec.JS.Space
       Text.Megaparsec.JS.Statem
+      Text.Megaparsec.JS.String
       Text.Megaparsec.JS.Types
       Text.Megaparsec.JS.VarDeclaration
   other-modules:
