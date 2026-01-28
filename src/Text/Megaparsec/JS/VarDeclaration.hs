@@ -2,6 +2,7 @@
 module Text.Megaparsec.JS.VarDeclaration where
 
 import Text.Megaparsec
+import Text.Megaparsec.JS.Space
 import Text.Megaparsec.JS.Types
 import Control.Monad.State
 import Text.Megaparsec.JS.Ident
@@ -45,12 +46,12 @@ varDeclarationSimple = do
     pstate@(ParserState { scopePath = sp, variables = vars, scopeLevel = slevel, scopePos = spos, currentFuncName = curFName}) <- get
 
     declType <- (string "let" <|> string "var")
-    void $ hspace1
+    void $ scn1
     fullName <- jsIdent
-    void $ hspace
+    void $ scn1
     
     void $ (single ';')
-    void $ hspace
+    void $ scn
 
     case declType of
         "let" -> do

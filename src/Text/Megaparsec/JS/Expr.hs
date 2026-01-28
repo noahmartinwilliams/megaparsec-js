@@ -4,6 +4,7 @@ import Text.Megaparsec.JS.Ident
 import Text.Megaparsec
 import Text.Megaparsec.Char
 import Text.Megaparsec.Char.Lexer
+import Text.Megaparsec.JS.Space
 import Text.Megaparsec.JS.Types
 import Text.Megaparsec.JS.VarDeclaration
 import Data.Text as T
@@ -23,9 +24,9 @@ jsExprVar = do
 
 jsExprInt :: JSParser Expr
 jsExprInt = do
-    void $ hspace
+    void $ scn
     integer <- (some digitChar)
-    void $ hspace
+    void $ scn
     return (IntExpr (read integer :: Int))
 
 mkMulExpr :: Expr -> Expr -> Expr
@@ -51,8 +52,9 @@ parens = between (string "(") (string ")")
 
 comma :: JSParser ()
 comma = do
+    void $ scn
     void $ single ','
-    void $ hspace
+    void $ scn
     return ()
 
 funcCallExpr :: JSParser (Expr -> Expr)
@@ -62,16 +64,16 @@ funcCallExpr = do
 
 jsAnonFuncExpr :: JSParser Expr 
 jsAnonFuncExpr = do
-    void $ hspace
+    void $ scn
     void $ (string "function")
-    void $ hspace1
+    void $ scn1
     notFollowedBy jsIdent
     void $ (single '(')
-    void $ hspace
+    void $ scn
     args <- (jsArg1)
-    void $ hspace
+    void $ scn
     void $ (single ')')
-    void $ hspace
+    void $ scn
     statems <- jsBlockStatem
     void $ hspace
     return (AnonFuncExpr args statems)
