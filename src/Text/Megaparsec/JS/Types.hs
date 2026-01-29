@@ -15,8 +15,10 @@ data BinOp = MemAccBinOp | AssignBinOp | AddBinOp | SubBinOp | MulBinOp | DivBin
 
 data Expr = AnonFuncExpr [Variable] Statem | FuncCallExpr Expr [Expr] | BinOpExpr Expr Expr BinOp | VarExpr Variable | IntExpr Int | StringLitExpr String deriving(Show, Eq)
 
-data Statem = IfStatem Expr Statem | EmptyStatem | BlockStatem Statem Statem | WhileStatem Expr Statem | ReturnStatem Expr | VarDeclareStatem [(Variable, Maybe Expr)] deriving(Show, Eq)
+data Statem = IfStatem Expr Statem | EmptyStatem | BlockStatem Statem Statem | WhileStatem Expr Statem | ReturnStatem Expr | VarDeclareStatem [(Variable, Maybe Expr)] | ExprStatem Expr deriving(Show, Eq)
 
 data Funct = Funct String [Variable] Statem  deriving(Show, Eq)
 
-data Doc = Doc [Either Funct [(Variable, Maybe Expr)]] deriving(Show, Eq)
+data DocEntry = DocFunct Funct | DocVarExpr [(Variable, Maybe Expr)] | DocStatems Statem deriving(Show, Eq)
+
+data Doc = Doc [DocEntry] deriving(Show, Eq)

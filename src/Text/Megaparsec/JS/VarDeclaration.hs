@@ -48,7 +48,7 @@ varDeclarationSimple = do
     declType <- scn1 (string "let" <|> string "var")
     fullName <- scn1 jsIdent
     
-    void $ scn (single ';')
+    void $ scn1 (single ';')
 
     case declType of
         "let" -> do

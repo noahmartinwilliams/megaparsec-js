@@ -15,17 +15,17 @@ jsFunc :: JSParser Funct
 jsFunc = do
     pstate@(ParserState { scopePath = spath, variables = vars, scopeLevel = slevel, scopePos = spos}) <- get
     void $ scn1 (string "function")
-    funcName <- scn jsIdent
+    funcName <- scn1 jsIdent
     put (pstate { currentFuncName = funcName } )
-    void $ scn (single '(')
-    args <- scn (try (jsArgList <|> jsArg1))
-    void $ scn (single ')')
+    void $ scn1 (single '(')
+    args <- scn1 (try (jsArgList <|> jsArg1))
+    void $ scn1 (single ')')
     let newMapList = Prelude.zip (Prelude.map (\(LocalVar { varName = v}) -> v) args) (Prelude.map (\x -> [x]) args)
         newMap = M.fromList newMapList
     put (pstate { scopePath = (spos : spath), variables = (M.union vars newMap), scopeLevel = 1, scopePos = (spos + 1)})
-    void $ scn (single '{')
-    s <- scn jsStatems
-    void $ scn (single '}')
+    void $ scn1 (single '{')
+    s <- scn1 jsStatems
+    void $ scn1 (single '}')
     put (pstate { currentFuncName = "", scopePath = spath, variables = vars, scopeLevel = 0})
     return (Funct funcName args s)
 
@@ -33,7 +33,7 @@ jsArg1 = some jsArg
 
 comma :: JSParser ()
 comma = do
-    void $ scn (single ',')
+    void $ scn1 (single ',')
     return ()
 
 jsArgList = sepBy jsArg comma

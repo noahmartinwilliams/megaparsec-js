@@ -1,25 +1,31 @@
 module Text.Megaparsec.JS.Doc(jsDoc) where
 
-import Data.Text
 import Data.Void
-import Text.Megaparsec.JS.Types
 import Text.Megaparsec
+import Text.Megaparsec.JS.Space
+import Text.Megaparsec.JS.Statem
+import Text.Megaparsec.JS.Types
 import Text.Megaparsec.JS.VarDeclaration
 import Text.Megaparsec.JS.Func
 
-jsDocVarDeclare :: JSParser (Either Funct [(Variable, Maybe Expr)])
+jsDocVarDeclare :: JSParser DocEntry
 jsDocVarDeclare = do
-    (VarDeclareStatem v) <- varDeclarationSimple
-    return (Right v)
+    (VarDeclareStatem v) <- scn1 varDeclarationSimple
+    return (DocVarExpr v)
 
 
-jsDocFunc :: JSParser (Either Funct [(Variable, Maybe Expr)])
+jsDocFunc :: JSParser DocEntry
 jsDocFunc = do
-    f <- jsFunc
-    return (Left f)
+    f <- scn1 jsFunc
+    return (DocFunct f)
+
+jsDocStatems :: JSParser DocEntry
+jsDocStatems = do
+    s <- scn1 jsStatem
+    return (DocStatems s)
 
 jsDoc :: JSParser (Doc, Text.Megaparsec.State String Void)
 jsDoc = do
-    syms <- (some (jsDocFunc <|> jsDocVarDeclare))
+    syms <- (some (jsDocFunc <|> jsDocVarDeclare <|> jsDocStatems))
     st <- getParserState
     return ((Doc syms), st)

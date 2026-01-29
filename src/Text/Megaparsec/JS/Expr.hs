@@ -18,13 +18,13 @@ import {-# SOURCE #-} Text.Megaparsec.JS.Func
 jsExprVar :: JSParser Expr
 jsExprVar = do
     stateVar <- get
-    name <- scn jsIdent
+    name <- scn1 jsIdent
     let varLookedUp = lookupVar name stateVar
     return (VarExpr varLookedUp)
 
 jsExprInt :: JSParser Expr
 jsExprInt = do
-    integer <- scn (some digitChar)
+    integer <- scn1 (some digitChar)
     return (IntExpr (read integer :: Int))
 
 mkMulExpr :: Expr -> Expr -> Expr
@@ -50,7 +50,7 @@ parens = between (string "(") (string ")")
 
 comma :: JSParser ()
 comma = do
-    void $ scn (single ',')
+    void $ scn1 (single ',')
     return ()
 
 funcCallExpr :: JSParser (Expr -> Expr)
@@ -58,19 +58,32 @@ funcCallExpr = do
     args <- parens (jsExpr `sepBy` comma)
     return (`FuncCallExpr` args)
 
-jsAnonFuncExpr :: JSParser Expr 
-jsAnonFuncExpr = do
+jsAnonFuncExpr1 :: JSParser Expr 
+jsAnonFuncExpr1 = do
     void $ scn1 (string "function")
     notFollowedBy jsIdent
-    void $ scn (single '(')
-    args <- scn (jsArg1)
-    void $ scn (single ')')
+    void $ scn1 (single '(')
+    args <- scn1 (jsArg1)
+    void $ scn1 (single ')')
     statems <- jsBlockStatem
     return (AnonFuncExpr args statems)
 
+jsAnonFuncExpr2 :: JSParser Expr
+jsAnonFuncExpr2 = do
+    void $ scn1 (string "function")
+    notFollowedBy jsIdent
+    void $ scn1 (single '(')
+    void $ scn1 (single ')')
+    statems <- jsBlockStatem
+    return (AnonFuncExpr [] statems)
+
+
+jsAnonFuncExpr :: JSParser Expr
+jsAnonFuncExpr = (jsAnonFuncExpr1 <|> jsAnonFuncExpr2 )
+
 jsExprOp :: JSParser Expr
 jsExprOp = do
-    let binary name f = InfixL (f <$ symbol C.space name)
+    let binary name f = InfixL (f <$ symbol lscn name)
         postfix p = Postfix p
         table = [ [postfix funcCallExpr ], [binary "=" mkAssignExpr], [binary "." mkMemAccExpr], [ binary "*" mkMulExpr, binary "/" mkDivExpr], [ binary "+" mkAddExpr, binary "-" mkSubExpr]]
         term = (jsExprInt <|> jsExprVar <|> parens jsExpr) <?> "term"
@@ -78,5 +91,5 @@ jsExprOp = do
 
 jsExpr :: JSParser Expr 
 jsExpr = do
-    e <- try (jsAnonFuncExpr <|> jsExprOp <|> jsStringLit )
+    e <- try (jsAnonFuncExpr <|> jsExprOp <|> jsStringLit <|> jsExprInt <|> jsExprVar)
     return e
