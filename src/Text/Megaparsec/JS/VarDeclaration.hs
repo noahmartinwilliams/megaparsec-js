@@ -41,8 +41,8 @@ lookupVar vname state@(ParserState { scopePath = sp, variables = vars, scopeLeve
             isInFunction vfn' (LocalVar { varFunctionName = vfn }) | vfn == vfn' = True
             isInFunction _ _ = False
 
-varDeclarationSimple :: JSParser Statem
-varDeclarationSimple = do
+jsVarDeclarationSimple :: JSParser Statem
+jsVarDeclarationSimple = do
     pstate@(ParserState { scopePath = sp, variables = vars, scopeLevel = slevel, scopePos = spos, currentFuncName = curFName}) <- get
 
     declType <- scn1 (string "let" <|> string "var")

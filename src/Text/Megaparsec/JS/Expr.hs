@@ -55,7 +55,7 @@ comma = do
 
 funcCallExpr :: JSParser (Expr -> Expr)
 funcCallExpr = do
-    args <- parens (jsExpr `sepBy` comma)
+    args <- parens ((scn1 jsExpr) `sepBy` comma)
     return (`FuncCallExpr` args)
 
 jsAnonFuncExpr1 :: JSParser Expr 
@@ -74,22 +74,22 @@ jsAnonFuncExpr2 = do
     notFollowedBy jsIdent
     void $ scn1 (single '(')
     void $ scn1 (single ')')
-    statems <- jsBlockStatem
+    statems <- scn1 jsBlockStatem
     return (AnonFuncExpr [] statems)
 
 
 jsAnonFuncExpr :: JSParser Expr
-jsAnonFuncExpr = (jsAnonFuncExpr1 <|> jsAnonFuncExpr2 )
+jsAnonFuncExpr = (try jsAnonFuncExpr1 <|> try jsAnonFuncExpr2 )
 
 jsExprOp :: JSParser Expr
 jsExprOp = do
-    let binary name f = InfixL (f <$ symbol lscn name)
+    let binary name f = InfixL (f <$ symbol lscn1 name)
         postfix p = Postfix p
         table = [ [postfix funcCallExpr ], [binary "=" mkAssignExpr], [binary "." mkMemAccExpr], [ binary "*" mkMulExpr, binary "/" mkDivExpr], [ binary "+" mkAddExpr, binary "-" mkSubExpr]]
-        term = (jsExprInt <|> jsExprVar <|> parens jsExpr) <?> "term"
-    makeExprParser term table <?> "expression"
+        terms = (jsAnonFuncExpr <|> (parens jsExprOp) <|> jsStringLit <|> jsExprInt <|> jsExprVar)
+    makeExprParser terms table <?> "expression"
 
 jsExpr :: JSParser Expr 
 jsExpr = do
-    e <- try (jsAnonFuncExpr <|> jsExprOp <|> jsStringLit <|> jsExprInt <|> jsExprVar)
+    e <- (try jsExprOp <|> try jsAnonFuncExpr <|> try jsStringLit <|> try jsExprInt <|> try jsExprVar)
     return e

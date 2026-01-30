@@ -9,5 +9,6 @@ import Text.Megaparsec.JS.Types
 
 jsStringLit :: JSParser Expr
 jsStringLit = do
-    str <- between (char '"') (char '"') (manyTill L.charLiteral (char '"'))
-    return (StringLitExpr str)
+    void $ single '"'
+    content <- manyTill (char '\\' *> char '"' <|> noneOf "\"") (char '"')
+    return (StringLitExpr content)

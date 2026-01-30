@@ -5,6 +5,7 @@ import Text.Megaparsec.Char.Lexer
 import Text.Megaparsec.Char
 import Text.Megaparsec.JS.Space
 import Text.Megaparsec.JS.Types 
+import Text.Megaparsec.JS.VarDeclaration
 import Data.Text as T
 import Control.Monad
 import Control.Monad.State
@@ -65,4 +66,7 @@ jsStatems = do
     ss <- some (jsStatem)
     return (Prelude.foldr BlockStatem EmptyStatem ss)
 
-jsStatem = (jsIfStatem <|> jsBlockStatem <|> jsWhileStatem <|> jsReturnStatem <|> jsExprStatem)
+jsVarDeclareStatem :: JSParser Statem
+jsVarDeclareStatem = jsVarDeclarationSimple
+
+jsStatem = (try jsVarDeclareStatem <|> try jsIfStatem <|> try jsBlockStatem <|> try jsWhileStatem <|> try jsReturnStatem <|> try jsExprStatem)

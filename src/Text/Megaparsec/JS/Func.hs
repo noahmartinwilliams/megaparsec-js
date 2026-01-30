@@ -22,14 +22,16 @@ jsFunc = do
     void $ scn1 (single ')')
     let newMapList = Prelude.zip (Prelude.map (\(LocalVar { varName = v}) -> v) args) (Prelude.map (\x -> [x]) args)
         newMap = M.fromList newMapList
-    put (pstate { scopePath = (spos : spath), variables = (M.union vars newMap), scopeLevel = 1, scopePos = (spos + 1)})
+    put (pstate { scopePath = ((spos + 1) : spath), variables = (M.union vars newMap), scopeLevel = 1, scopePos = (spos + 1)})
     void $ scn1 (single '{')
     s <- scn1 jsStatems
     void $ scn1 (single '}')
     put (pstate { currentFuncName = "", scopePath = spath, variables = vars, scopeLevel = 0})
     return (Funct funcName args s)
 
-jsArg1 = some jsArg
+jsArg1 = do
+    a <- jsArg
+    return [a]
 
 comma :: JSParser ()
 comma = do
