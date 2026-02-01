@@ -4,6 +4,7 @@ import Control.Monad
 import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char
+import qualified Text.Megaparsec.Char.Lexer as L
 import Text.Megaparsec.JS.Space
 import Text.Megaparsec.JS.Statem
 import Text.Megaparsec.JS.Types
@@ -23,13 +24,20 @@ jsDocFunc = do
 
 jsDocStatems :: JSParser DocEntry
 jsDocStatems = do
-    s <- scn1 jsStatem
+    s <- scn1 jsStatems
     return (DocStatems s)
+
+lineComment :: JSParser ()
+lineComment = do
+    void $ string "//"
+    void $ manyTill L.charLiteral (single '\n')
+    return ()
 
 jsDoc :: JSParser (Doc, Text.Megaparsec.State String Void)
 jsDoc = do
-    void $ scn1 (return ())
+    void $ optional (lineComment)
     syms <- scn1 (many (jsDocFunc <|> jsDocVarDeclare <|> jsDocStatems))
+    void $ optional (lineComment)
     st <- getParserState
     return ((Doc syms), st)
 
