@@ -8,12 +8,13 @@ import Text.Megaparsec.JS.Ident
 import Text.Megaparsec
 import Text.Megaparsec.Char as C
 import Text.Megaparsec.Char.Lexer as L
+import {-# SOURCE #-} Text.Megaparsec.JS.Func
+import {-# SOURCE #-} Text.Megaparsec.JS.JSON
 import Text.Megaparsec.JS.Space
+import {-# SOURCE #-} Text.Megaparsec.JS.Statem 
 import Text.Megaparsec.JS.String
 import Text.Megaparsec.JS.Types
 import Text.Megaparsec.JS.VarDeclaration
-import {-# SOURCE #-} Text.Megaparsec.JS.Statem 
-import {-# SOURCE #-} Text.Megaparsec.JS.Func
 
 jsExprVar :: JSParser Expr
 jsExprVar = do
@@ -91,5 +92,5 @@ jsExprOp = do
 
 jsExpr :: JSParser Expr 
 jsExpr = do
-    e <- (try jsExprOp <|> try jsAnonFuncExpr <|> try jsStringLit <|> try jsExprInt <|> try jsExprVar)
+    e <- (try jsJSON <|> try jsExprOp <|> try jsAnonFuncExpr <|> try jsStringLit <|> try jsExprInt <|> try jsExprVar )
     return e

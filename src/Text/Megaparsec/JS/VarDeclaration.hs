@@ -56,7 +56,7 @@ jsVarDeclarationSimple = do
             put (pstate { variables = (insertVar vars lvar ) })
             return (VarDeclareStatem [(lvar, Nothing)])
         "var" -> do
-            let lvar = (LocalVar { varFunctionName = curFName, varName = fullName, varScopeLevel = 1, varScopePos = spos})
+            let lvar = (LocalVar { varFunctionName = curFName, varName = fullName, varScopeLevel = 1, varScopePos = spos, varPath = sp })
             put (pstate { variables = (insertVar vars lvar) })
             return (VarDeclareStatem [(lvar, Nothing)]) 
 

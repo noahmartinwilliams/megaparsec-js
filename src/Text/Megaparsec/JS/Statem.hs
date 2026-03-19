@@ -14,14 +14,14 @@ import Text.Megaparsec.JS.Expr
 jsReturnStatem1 :: JSParser Statem
 jsReturnStatem1 = do
     void $ scn1 (string "return")
-    e <- scn1 (jsExpr )
+    e <- scn1 (optional jsExpr )
     void $ scn1 (lookAhead (single '}'))
     return (ReturnStatem e)
 
 jsReturnStatem2 :: JSParser Statem
 jsReturnStatem2 = do
     void $ scn1 (string "return")
-    e <- scn1 (jsExpr )
+    e <- scn1 (optional jsExpr )
     void $ scn1 (single ';')
     return (ReturnStatem e)
 

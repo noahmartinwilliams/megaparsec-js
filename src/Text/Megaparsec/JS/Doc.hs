@@ -37,6 +37,7 @@ jsDoc :: JSParser (Doc, Text.Megaparsec.State String Void)
 jsDoc = do
     void $ optional (lineComment)
     syms <- scn1 (many (jsDocFunc <|> jsDocVarDeclare <|> jsDocStatems))
+    void $ optional (single '\n')
     void $ optional (lineComment)
     st <- getParserState
     return ((Doc syms), st)
