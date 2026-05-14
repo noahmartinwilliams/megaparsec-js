@@ -2,7 +2,6 @@
 module Main where
 
 import Control.Monad.State
-import Data.Text as T
 import Data.Either
 import Data.Map
 import Text.Megaparsec
@@ -16,13 +15,13 @@ import Text.Megaparsec.JS.VarDeclaration
 test01 :: IO ()
 test01 = do
     let input = "let v;"
-        result = runParserT varDeclarationSimple "" (T.pack input)
-        (result', _) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = (T.pack "foo") })
+        result = runParserT jsVarDeclarationSimple "" input
+        (result', _) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = "foo" })
     if isRight result'
     then do
         let (Right result'') = result'
         let (VarDeclareStatem [(LocalVar { varName = vname }, Nothing)]) = result''
-        if vname == (T.pack "v")
+        if vname == "v"
         then
             putStrLn ("Test 01 succeeded.")
         else
@@ -46,16 +45,16 @@ test02 = do
 test03 :: IO ()
 test03 = do
     let input = "let v;"
-        result = runParserT varDeclarationSimple "" (T.pack input)
-        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = (T.pack "foo") })
+        result = runParserT jsVarDeclarationSimple "" input
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = "foo" })
         input2 = "v"
-        result2 = runParserT jsExprVar "" (T.pack input2)
+        result2 = runParserT jsExprVar "" input2
         (result2', _) = runState result2 newState
     if isRight result2'
     then do
         let (Right result2'') = result2'
         let (VarExpr (LocalVar { varName = vname })) = result2''
-        if vname == (T.pack "v")
+        if vname == "v"
         then
             putStrLn ("Test 03 succeeded.")
         else
@@ -66,10 +65,10 @@ test03 = do
 test04 :: IO ()
 test04 = do
     let input = "let v;"
-        result = runParserT varDeclarationSimple "" (T.pack input)
-        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = (T.pack "foo") })
+        result = runParserT jsVarDeclarationSimple "" input
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = "foo" })
         input2 = "v + 1"
-        result2 = runParserT jsExpr "" (T.pack input2)
+        result2 = runParserT jsExpr "" input2
         (result2', _) = runState result2 newState
     if isRight result2'
     then do
@@ -86,10 +85,10 @@ test04 = do
 test05 :: IO ()
 test05 = do
     let input = "let v;"
-        result = runParserT varDeclarationSimple "" (T.pack input)
-        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = (T.pack "foo") })
+        result = runParserT jsVarDeclarationSimple "" input
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = "foo" })
         input2 = "v . mem"
-        result2 = runParserT jsExpr "" (T.pack input2)
+        result2 = runParserT jsExpr "" input2
         (result2', _) = runState result2 newState
     if isRight result2'
     then do
@@ -106,10 +105,10 @@ test05 = do
 test06 :: IO ()
 test06 = do
     let input = "let v;"
-        result = runParserT varDeclarationSimple "" (T.pack input)
-        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = (T.pack "foo") })
+        result = runParserT jsVarDeclarationSimple "" input
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = "foo" })
         input2 = "v = v"
-        result2 = runParserT jsExpr "" (T.pack input2)
+        result2 = runParserT jsExpr "" input2
         (result2', _) = runState result2 newState
     if isRight result2'
     then do
@@ -126,10 +125,10 @@ test06 = do
 test07 :: IO ()
 test07 = do
     let input = "let v;"
-        result = runParserT varDeclarationSimple "" (T.pack input)
-        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = (T.pack "foo") })
+        result = runParserT jsVarDeclarationSimple "" input
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = "foo" })
         input2 = "v = v * v + v"
-        result2 = runParserT jsExpr "" (T.pack input2)
+        result2 = runParserT jsExpr "" input2
         (result2', _) = runState result2 newState
     if isRight result2'
     then do
@@ -146,12 +145,12 @@ test07 = do
 test08 :: IO ()
 test08 = do
     let input = "return 1;"
-        result = runParserT jsReturnStatem "" (T.pack input)
-        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = (T.pack "foo") })
+        result = runParserT jsReturnStatem "" input
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = "foo" })
     if isRight result'
     then do
         let (Right result2) = result'
-        if (ReturnStatem (IntExpr 1)) == result2
+        if (ReturnStatem (Just (IntExpr 1))) == result2
         then
             putStrLn ("Test 08 succeeded.")
         else
@@ -162,12 +161,12 @@ test08 = do
 test09 :: IO ()
 test09 = do
     let input = "while (1) return 1;"
-        result = runParserT jsStatem "" (T.pack input)
-        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = (T.pack "foo") })
+        result = runParserT jsStatem "" input
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = "foo" })
     if isRight result'
     then do
         let (Right result2) = result'
-        if (WhileStatem (IntExpr 1) (ReturnStatem (IntExpr 1))) == result2
+        if (WhileStatem (IntExpr 1) (ReturnStatem (Just (IntExpr 1)))) == result2
         then
             putStrLn ("Test 09 succeeded.")
         else
@@ -178,12 +177,12 @@ test09 = do
 test10 :: IO ()
 test10 = do
     let input = "while (1) {return 1; }"
-        result = runParserT jsStatem "" (T.pack input)
-        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = (T.pack "foo") })
+        result = runParserT jsStatem "" input
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = "foo" })
     if isRight result'
     then do
         let (Right result2) = result'
-        if (WhileStatem (IntExpr 1) (BlockStatem (ReturnStatem (IntExpr 1)) EmptyStatem)) == result2
+        if (WhileStatem (IntExpr 1) (BlockStatem (ReturnStatem (Just (IntExpr 1))) EmptyStatem)) == result2
         then
             putStrLn ("Test 10 succeeded.")
         else
@@ -194,12 +193,12 @@ test10 = do
 test11 :: IO ()
 test11 = do
     let input = "if (1) { return 0; }"
-        result = runParserT jsStatem "" (T.pack input)
-        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = (T.pack "foo") })
+        result = runParserT jsStatem "" input
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = "foo" })
     if isRight result'
     then do
         let (Right result2) = result'
-        if (IfStatem (IntExpr 1) (BlockStatem (ReturnStatem (IntExpr 0)) EmptyStatem)) == result2
+        if (IfStatem (IntExpr 1) (BlockStatem (ReturnStatem (Just (IntExpr 0))) EmptyStatem)) == result2
         then
             putStrLn ("Test 11 succeeded.")
         else
@@ -210,12 +209,12 @@ test11 = do
 test12 :: IO ()
 test12 = do
     let input = "function myFunc(a, b) { return a + b ; }"
-        result = runParserT jsFunc "" (T.pack input)
-        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = (T.pack "") })
+        result = runParserT jsFunc "" input
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = "" })
     if isRight result'
     then do
         let (Right (Funct fname _ _)) = result'
-        if fname == (T.pack "myFunc")
+        if fname == "myFunc"
         then
             putStrLn ("Test 12 succeeded.")
         else
@@ -226,12 +225,12 @@ test12 = do
 test13 :: IO ()
 test13 = do
     let input = "function myFunc(a, b) { return a + b ; }"
-        result = runParserT jsFunc "" (T.pack input)
-        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = (T.pack "") })
+        result = runParserT jsFunc "" input
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = "" })
     if isRight result'
     then do
         let (Right (Funct _ vars _)) = result'
-        if (vars !! 0) == LocalVar { varPath = [1, 1], varFunctionName = (T.pack "myFunc"), varName = (T.pack "a"), varScopeLevel = 1, varScopePos = 1}
+        if (vars !! 0) == LocalVar { varPath = [1, 1], varFunctionName = "myFunc", varName = "a", varScopeLevel = 1, varScopePos = 1}
         then
             putStrLn ("Test 13 succeeded.")
         else
@@ -242,8 +241,8 @@ test13 = do
 test14 :: IO ()
 test14 = do
     let input = "func(1, 2)"
-        result = runParserT jsExpr "" (T.pack input)
-        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = (T.pack "") })
+        result = runParserT jsExpr "" input
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = "" })
     if isRight result'
     then do
         let (Right (FuncCallExpr _ args)) = result'
@@ -258,8 +257,8 @@ test14 = do
 test15 :: IO ()
 test15 = do
     let input = "function f(a) { return a + 1; } var v ;"
-        result = runParserT jsDoc "" (T.pack input)
-        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = (T.pack "") })
+        result = runParserT jsDoc "" input
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = "" })
     if isRight result'
     then do
         let (Right ((Doc syms), _)) = result'
@@ -274,8 +273,8 @@ test15 = do
 test16 :: IO ()
 test16 = do
     let input = "function f(a) { return function(b) { return a + b; } ; }  var v ;"
-        result = runParserT jsDoc "" (T.pack input)
-        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = (T.pack "") })
+        result = runParserT jsDoc "" input
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = "" })
     if isRight result'
     then do
         let (Right ((Doc syms), _)) = result'
