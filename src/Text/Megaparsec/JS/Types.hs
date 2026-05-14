@@ -13,7 +13,7 @@ data Variable = UnknownVar String | GlobalVar String | LocalVar { varPath :: [In
 
 data BinOp = MemAccBinOp | AssignBinOp | AddBinOp | SubBinOp | MulBinOp | DivBinOp deriving(Show, Eq)
 
-data Expr = TernaryExpr Expr Expr Expr | AnonFuncExpr [Variable] Statem | FuncCallExpr Expr [Expr] | BinOpExpr Expr Expr BinOp | VarExpr Variable | IntExpr Int | StringLitExpr String | ObjExpr (Map String Expr) deriving(Show, Eq)
+data Expr = BoolExpr Bool | TernaryExpr Expr Expr Expr | AnonFuncExpr [Variable] Statem | FuncCallExpr Expr [Expr] | BinOpExpr Expr Expr BinOp | VarExpr Variable | IntExpr Int | StringLitExpr String | ObjExpr (Map String Expr) deriving(Show, Eq)
 
 data Statem = IfStatem Expr Statem | EmptyStatem | BlockStatem Statem Statem | WhileStatem Expr Statem | ReturnStatem (Maybe Expr) | VarDeclareStatem [(Variable, Maybe Expr)] | ExprStatem Expr deriving(Show, Eq)
 

@@ -133,7 +133,7 @@ test07 = do
     if isRight result2'
     then do
         let (Right result2'') = result2'
-        let (BinOpExpr _ _ op2) = result2''
+        let (BinOpExpr _ (BinOpExpr _ _ op2) _) = result2''
         if op2 == AddBinOp
         then
             putStrLn ("Test 07 succeeded.")
@@ -285,6 +285,23 @@ test16 = do
             putStrLn ("Test 16 failed.")
     else
         let (Left err) = result' in putStrLn (errorBundlePretty err)
+
+test17 :: IO ()
+test17 = do
+    let input = "return true ? 2 : 3;"
+        result = runParserT jsStatem "" input
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = "foo" })
+    if isRight result'
+    then do
+        let (Right (expr)) = result'
+        if expr == ReturnStatem (Just (TernaryExpr (BoolExpr True ) (IntExpr 2) (IntExpr 3)))
+        then
+            putStrLn ("Test 17 succeeded.")
+        else
+            putStrLn ("Test 17 failed. Got: \"" ++ (show expr) ++ "\".")
+    else
+        let (Left err) = result' in putStrLn (errorBundlePretty err)
+
 main :: IO ()
 main = do
     test01
@@ -303,3 +320,4 @@ main = do
     test14
     test15
     test16
+    test17

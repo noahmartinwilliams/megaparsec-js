@@ -28,6 +28,15 @@ jsExprInt = do
     integer <- scn1 (some digitChar)
     return (IntExpr (read integer :: Int))
 
+jsExprBool :: JSParser Expr 
+jsExprBool = do
+    val <- scn1 (string "true" <|> string "false")
+    if val == "true"
+    then
+        return (BoolExpr True)
+    else 
+        return (BoolExpr False)
+
 mkMulExpr :: Expr -> Expr -> Expr
 mkMulExpr e1 e2 = BinOpExpr e1 e2 MulBinOp
 
@@ -78,16 +87,20 @@ jsAnonFuncExpr2 = do
     statems <- scn1 jsBlockStatem
     return (AnonFuncExpr [] statems)
 
-
 jsAnonFuncExpr :: JSParser Expr
 jsAnonFuncExpr = (try jsAnonFuncExpr1 <|> try jsAnonFuncExpr2 )
+
+jsTernary :: JSParser (Expr -> Expr -> Expr -> Expr)
+jsTernary = do
+    void $ scn1 (single ':')
+    return (\cond -> \thenV -> \elseV -> TernaryExpr cond thenV elseV)
 
 jsExprOp :: JSParser Expr
 jsExprOp = do
     let binary name f = InfixL (f <$ symbol lscn1 name)
         postfix p = Postfix p
-        table = [ [postfix funcCallExpr ], [binary "=" mkAssignExpr], [binary "." mkMemAccExpr], [ binary "*" mkMulExpr, binary "/" mkDivExpr], [ binary "+" mkAddExpr, binary "-" mkSubExpr]]
-        terms = (jsAnonFuncExpr <|> (parens jsExprOp) <|> jsStringLit <|> jsExprInt <|> jsExprVar)
+        table = [ [postfix funcCallExpr ], [binary "*" mkMulExpr, binary "/" mkDivExpr], [binary "+" mkAddExpr, binary "-" mkSubExpr], [binary "=" mkAssignExpr], [TernR (jsTernary <$ scn1 (single '?'))], [binary "." mkMemAccExpr] ]
+        terms = (jsExprBool <|> jsAnonFuncExpr <|> (parens jsExprOp) <|> jsStringLit <|> jsExprInt <|> jsExprVar)
     makeExprParser terms table <?> "expression"
 
 jsExpr :: JSParser Expr 
