@@ -55,6 +55,9 @@ mkAssignExpr e1 e2 = BinOpExpr e1 e2 AssignBinOp
 mkMemAccExpr :: Expr -> Expr -> Expr
 mkMemAccExpr e1 e2 = BinOpExpr e1 e2 MemAccBinOp
 
+mkEqualityExpr :: Expr -> Expr -> Expr
+mkEqualityExpr e1 e2 = BinOpExpr e1 e2 EqualityBinOp
+
 parens :: JSParser a -> JSParser a
 parens = between (string "(") (string ")")
 
@@ -99,7 +102,7 @@ jsExprOp :: JSParser Expr
 jsExprOp = do
     let binary name f = InfixL (f <$ symbol lscn1 name)
         postfix p = Postfix p
-        table = [ [postfix funcCallExpr ], [binary "*" mkMulExpr, binary "/" mkDivExpr], [binary "+" mkAddExpr, binary "-" mkSubExpr], [binary "=" mkAssignExpr], [TernR (jsTernary <$ scn1 (single '?'))], [binary "." mkMemAccExpr] ]
+        table = [ [postfix funcCallExpr ], [binary "*" mkMulExpr, binary "/" mkDivExpr], [binary "+" mkAddExpr, binary "-" mkSubExpr], [binary "==" mkEqualityExpr], [binary "=" mkAssignExpr], [TernR (jsTernary <$ scn1 (single '?'))], [binary "." mkMemAccExpr] ]
         terms = (jsExprBool <|> jsAnonFuncExpr <|> (parens jsExprOp) <|> jsStringLit <|> jsExprInt <|> jsExprVar)
     makeExprParser terms table <?> "expression"
 

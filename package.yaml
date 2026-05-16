@@ -43,9 +43,9 @@ library:
   - parser-combinators
 
 tests:
-  megaparsec-js-test:
+  libTest:
     main:                Spec.hs
-    source-dirs:         test
+    source-dirs:         test/lib/
     ghc-options:
     - -threaded
     - -rtsopts

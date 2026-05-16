@@ -52,15 +52,16 @@ library
     , text
   default-language: Haskell2010
 
-test-suite megaparsec-js-test
+test-suite libTest
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      Expr
       Paths_megaparsec_js
   autogen-modules:
       Paths_megaparsec_js
   hs-source-dirs:
-      test
+      test/lib/
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
