@@ -14,7 +14,7 @@ import Text.Megaparsec.JS.Space
 import {-# SOURCE #-} Text.Megaparsec.JS.Statem 
 import Text.Megaparsec.JS.String
 import Text.Megaparsec.JS.Types
-import Text.Megaparsec.JS.VarDeclaration
+import {-# SOURCE #-} Text.Megaparsec.JS.VarDeclaration
 
 jsExprVar :: JSParser Expr
 jsExprVar = do

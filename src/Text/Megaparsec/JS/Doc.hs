@@ -8,7 +8,7 @@ import qualified Text.Megaparsec.Char.Lexer as L
 import Text.Megaparsec.JS.Space
 import Text.Megaparsec.JS.Statem
 import Text.Megaparsec.JS.Types
-import Text.Megaparsec.JS.VarDeclaration
+import {-# SOURCE #-} Text.Megaparsec.JS.VarDeclaration
 import Text.Megaparsec.JS.Func
 
 jsDocVarDeclare :: JSParser DocEntry

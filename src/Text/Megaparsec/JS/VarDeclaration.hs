@@ -2,6 +2,7 @@
 module Text.Megaparsec.JS.VarDeclaration where
 
 import Text.Megaparsec
+import Text.Megaparsec.JS.Expr
 import Text.Megaparsec.JS.Space
 import Text.Megaparsec.JS.Types
 import Control.Monad.State
@@ -14,7 +15,6 @@ import Control.Monad.State
 import Data.Maybe
 import Data.Map
 
-lookupVar :: String -> ParserState -> Variable
 lookupVar vname state@(ParserState { scopePath = sp, variables = vars, scopeLevel = sl, scopePos = spos, currentFuncName = cfn}) = do
     let lookedup = Data.Map.lookup vname vars
     if isNothing lookedup 
@@ -41,26 +41,44 @@ lookupVar vname state@(ParserState { scopePath = sp, variables = vars, scopeLeve
             isInFunction vfn' (LocalVar { varFunctionName = vfn }) | vfn == vfn' = True
             isInFunction _ _ = False
 
-jsVarDeclarationSimple :: JSParser Statem
+jsVarDeclarationAssign1 :: JSParser (String, Maybe Expr)
+jsVarDeclarationAssign1 = do
+    fullName <- scn1 jsIdent
+    void $ scn1 (single '=')
+    e <- scn1 jsExpr
+    return (fullName, Just e)
+
+jsVarDeclarationAssign0 :: JSParser (String, Maybe Expr)
+jsVarDeclarationAssign0 = do
+    fullName <- scn1 jsIdent
+    return (fullName, Nothing)
+    
+jsVarDeclarationAssignMany :: JSParser [(String, Maybe Expr)]
+jsVarDeclarationAssignMany = do
+    sepBy (try jsVarDeclarationAssign1 <|> try jsVarDeclarationAssign0) (scn1 (void $ single ','))
+
+
 jsVarDeclarationSimple = do
     pstate@(ParserState { scopePath = sp, variables = vars, scopeLevel = slevel, scopePos = spos, currentFuncName = curFName}) <- get
 
     declType <- scn1 (string "let" <|> string "var")
-    fullName <- scn1 jsIdent
+    variables <- jsVarDeclarationAssignMany
     
     void $ scn1 (single ';')
 
     case declType of
         "let" -> do
-            let lvar = (LocalVar { varPath = sp, varFunctionName = curFName, varName = fullName, varScopeLevel = slevel, varScopePos = spos})
-            put (pstate { variables = (insertVar vars lvar ) })
-            return (VarDeclareStatem [(lvar, Nothing)])
-        "var" -> do
-            let lvar = (LocalVar { varFunctionName = curFName, varName = fullName, varScopeLevel = 1, varScopePos = spos, varPath = sp })
-            put (pstate { variables = (insertVar vars lvar) })
-            return (VarDeclareStatem [(lvar, Nothing)]) 
+            let lvars = Prelude.map (\(fullName, _) -> (LocalVar { varPath = sp, varFunctionName = curFName, varName = fullName, varScopeLevel = slevel, varScopePos = spos})) variables
+                lvars' = Prelude.zipWith (\x -> \(_, expr) -> (x, expr)) lvars variables
+            put (pstate { variables = (insertVars vars lvars ) })
+            return (VarDeclareStatem lvars')
 
-insertVar :: Map String [Variable] -> Variable -> Map String [Variable]
+        "var" -> do
+            let lvars = Prelude.map (\(fullName, _) -> (LocalVar { varFunctionName = curFName, varName = fullName, varScopeLevel = 1, varScopePos = spos, varPath = sp })) variables
+                lvars' = Prelude.zipWith (\x -> \(_, expr) -> (x, expr)) lvars variables
+            put (pstate { variables = (insertVars vars lvars) })
+            return (VarDeclareStatem lvars') 
+
 insertVar m variable@(LocalVar { varName = vname }) = do
     let lu = Data.Map.lookup vname m 
     if isNothing lu
@@ -68,3 +86,7 @@ insertVar m variable@(LocalVar { varName = vname }) = do
         insert vname [variable] m
     else
         let (Just lu') = lu in insert vname (variable : lu') m
+
+insertVars :: Map String [Variable] -> [Variable] -> Map String [Variable]
+insertVars m [] = m
+insertVars m (head : tail) = insertVars (insertVar m head) tail
