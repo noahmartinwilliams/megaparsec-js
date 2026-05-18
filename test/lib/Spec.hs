@@ -165,7 +165,7 @@ main :: IO ()
 main = do
     test01
     test02
-    test03
+    test03 -- VarDeclare
     test04
     test05
     test06
@@ -182,3 +182,5 @@ main = do
     test17
     test18
     test19
+    test20 -- VarDeclare
+    test21 -- VarDeclare

@@ -7,8 +7,7 @@ module Text.Megaparsec.JS.Types,
 jsInitialState
 ) where
 
-import Data.Map
-import Data.Text as T
+import Data.Map as Map
 import Text.Megaparsec.JS.Doc
 import Text.Megaparsec.JS.Expr
 import Text.Megaparsec.JS.Statem
@@ -16,4 +15,7 @@ import Text.Megaparsec.JS.String
 import Text.Megaparsec.JS.Types
 
 jsInitialState :: ParserState
-jsInitialState = ParserState { scopePath = [0], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = "" }
+jsInitialState = do
+    let docVar = ("document", [GlobalVar { gvVarName = "document", gvMethods = [("write", 1)]}])
+        initialVars = Map.fromList [docVar]
+    ParserState { scopePath = [0], variables = initialVars, scopeLevel = 0, scopePos = 0, currentFuncName = "" }

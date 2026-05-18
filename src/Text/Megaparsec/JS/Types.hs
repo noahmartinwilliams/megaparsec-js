@@ -9,7 +9,9 @@ type JSParser = ParsecT Void String (S.State ParserState)
 
 data ParserState = ParserState { scopePath :: [Int], variables :: Map String [Variable], scopeLevel :: Int, scopePos :: Int, currentFuncName :: String } deriving(Show, Eq)
 
-data Variable = UnknownVar String | GlobalVar String | LocalVar { varPath :: [Int], varFunctionName :: String, varName :: String, varScopeLevel :: Int, varScopePos :: Int} deriving(Show, Eq)
+data Variable = UnknownVar String | 
+    GlobalVar {gvVarName :: String, gvMethods :: [(String, Int)]} | 
+    LocalVar { varPath :: [Int], varFunctionName :: String, varName :: String, varScopeLevel :: Int, varScopePos :: Int} deriving(Show, Eq)
 
 data BinOp = EqualityBinOp | MemAccBinOp | AssignBinOp | AddBinOp | SubBinOp | MulBinOp | DivBinOp deriving(Show, Eq)
 

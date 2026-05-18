@@ -32,12 +32,12 @@ lookupVar vname state@(ParserState { scopePath = sp, variables = vars, scopeLeve
 
             isInScope :: [Int] -> Variable -> Bool
             isInScope slist (LocalVar { varPath = vpath }) = slist == vpath
-            isInScope _ (GlobalVar _) = True
+            isInScope _ (GlobalVar {}) = True
             isInScope _ (UnknownVar _) = True
 
             isInFunction :: String -> Variable -> Bool
             isInFunction _ (UnknownVar _) = True
-            isInFunction _ (GlobalVar _) = True
+            isInFunction _ (GlobalVar {}) = True
             isInFunction vfn' (LocalVar { varFunctionName = vfn }) | vfn == vfn' = True
             isInFunction _ _ = False
 
