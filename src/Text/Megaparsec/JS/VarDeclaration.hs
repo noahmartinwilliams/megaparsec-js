@@ -51,11 +51,12 @@ jsVarDeclarationAssign1 = do
 jsVarDeclarationAssign0 :: JSParser (String, Maybe Expr)
 jsVarDeclarationAssign0 = do
     fullName <- scn1 jsIdent
+    void $ notFollowedBy (scn1 (single '='))
     return (fullName, Nothing)
     
 jsVarDeclarationAssignMany :: JSParser [(String, Maybe Expr)]
 jsVarDeclarationAssignMany = do
-    sepBy (try jsVarDeclarationAssign1 <|> try jsVarDeclarationAssign0) (scn1 (void $ single ','))
+    sepBy1 (try jsVarDeclarationAssign0 <|> try jsVarDeclarationAssign1) (scn1 (single ','))
 
 
 jsVarDeclarationSimple = do

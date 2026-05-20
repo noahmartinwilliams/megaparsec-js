@@ -59,7 +59,8 @@ mkEqualityExpr :: Expr -> Expr -> Expr
 mkEqualityExpr e1 e2 = BinOpExpr e1 e2 EqualityBinOp
 
 parens :: JSParser a -> JSParser a
-parens = between (string "(") (string ")")
+parens x = do
+    scn1 $ between (string "(") (string ")") x
 
 comma :: JSParser ()
 comma = do
