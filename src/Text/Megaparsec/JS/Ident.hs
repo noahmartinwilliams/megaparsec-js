@@ -11,7 +11,7 @@ import Text.Megaparsec.JS.Types
 
 keywords :: Set String
 keywords = do
-    let l = ["var", "let", "function", "return"]
+    let l = ["var", "let", "function", "return", "await", "new"]
     Set.fromList l
 
 ident :: JSParser String

@@ -17,5 +17,7 @@ import Text.Megaparsec.JS.Types
 jsInitialState :: ParserState
 jsInitialState = do
     let docVar = ("document", [GlobalVar { gvVarName = "document", gvMethods = [("write", 1)]}])
+        dateFunc = ("Date", DateFunct)
         initialVars = Map.fromList [docVar]
-    ParserState { scopePath = [0], variables = initialVars, scopeLevel = 0, scopePos = 0, currentFuncName = "" }
+        initialFuncs = Map.fromList [dateFunc]
+    ParserState { scopePath = [0], functions = initialFuncs, variables = initialVars, scopeLevel = 0, scopePos = 0, currentFuncName = "" }

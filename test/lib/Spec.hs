@@ -167,7 +167,7 @@ main = do
     test02
     test03 -- VarDeclare
     test04
-    test05
+    test05 -- Expr
     test06
     test07
     test08
@@ -180,7 +180,8 @@ main = do
     test15
     test16
     test17
-    test18
+    test18 -- Expr
     test19
     test20 -- VarDeclare
     test21 -- VarDeclare
+    test22 -- Expr

@@ -121,3 +121,18 @@ test18 = do
             putStrLn ("Test 18 failed.")
     else
         let (Left err) = result' in putStrLn (errorBundlePretty err)
+
+test22 :: IO ()
+test22 = do
+    let input = "new Date()"
+        result = runParserT jsExpr "" input
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = "" })
+    if isRight result'
+    then do
+        if result' == (Right (NewExpr (FuncCallExpr (VarExpr (UnknownVar "Date")) [])))
+        then
+            putStrLn ("Test 22 succeeded.")
+        else
+            putStrLn ("Test 22 failed. Got: \"" ++ (show result') ++ "\".")
+    else
+        let (Left err) = result' in putStrLn (errorBundlePretty err)
