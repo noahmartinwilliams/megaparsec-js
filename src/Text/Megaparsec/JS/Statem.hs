@@ -69,4 +69,13 @@ jsStatems = do
 jsVarDeclareStatem :: JSParser Statem
 jsVarDeclareStatem = jsVarDeclarationSimple
 
-jsStatem = (try jsVarDeclareStatem <|> try jsIfStatem <|> try jsBlockStatem <|> try jsWhileStatem <|> try jsReturnStatem <|> try jsExprStatem)
+jsStatem1 :: JSParser Statem
+jsStatem1 = (try jsVarDeclareStatem <|> try jsIfStatem <|> try jsBlockStatem <|> try jsWhileStatem <|> try jsReturnStatem <|> try jsExprStatem)
+
+jsStatem2 :: JSParser Statem
+jsStatem2 = do
+    j <- scn1 jsStatem1
+    void $ scn1 (single ';')
+    return j
+
+jsStatem = (try jsStatem2 <|> try jsStatem1)

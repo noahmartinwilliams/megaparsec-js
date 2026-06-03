@@ -57,6 +57,7 @@ test-suite libTest
   main-is: Spec.hs
   other-modules:
       Expr
+      Statem
       VarDeclares
       Paths_megaparsec_js
   autogen-modules:

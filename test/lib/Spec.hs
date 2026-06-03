@@ -5,6 +5,7 @@ import Control.Monad.State
 import Data.Either
 import Data.Map
 import Expr
+import Statem
 import Text.Megaparsec
 import Text.Megaparsec.JS.Doc
 import Text.Megaparsec.JS.Expr
@@ -13,72 +14,6 @@ import Text.Megaparsec.JS.Statem
 import Text.Megaparsec.JS.Types
 import Text.Megaparsec.JS.VarDeclaration
 import VarDeclares
-
-
-
-test08 :: IO ()
-test08 = do
-    let input = "return 1;"
-        result = runParserT jsReturnStatem "" input
-        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = "foo" })
-    if isRight result'
-    then do
-        let (Right result2) = result'
-        if (ReturnStatem (Just (IntExpr 1))) == result2
-        then
-            putStrLn ("Test 08 succeeded.")
-        else
-            putStrLn ("Test 08 failed.")
-    else
-        let (Left err) = result' in putStrLn (errorBundlePretty err)
-
-test09 :: IO ()
-test09 = do
-    let input = "while (1) return 1;"
-        result = runParserT jsStatem "" input
-        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = "foo" })
-    if isRight result'
-    then do
-        let (Right result2) = result'
-        if (WhileStatem (IntExpr 1) (ReturnStatem (Just (IntExpr 1)))) == result2
-        then
-            putStrLn ("Test 09 succeeded.")
-        else
-            putStrLn ("Test 09 failed.")
-    else
-        let (Left err) = result' in putStrLn (errorBundlePretty err)
-
-test10 :: IO ()
-test10 = do
-    let input = "while (1) {return 1; }"
-        result = runParserT jsStatem "" input
-        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = "foo" })
-    if isRight result'
-    then do
-        let (Right result2) = result'
-        if (WhileStatem (IntExpr 1) (BlockStatem (ReturnStatem (Just (IntExpr 1))) EmptyStatem)) == result2
-        then
-            putStrLn ("Test 10 succeeded.")
-        else
-            putStrLn ("Test 10 failed.")
-    else
-        let (Left err) = result' in putStrLn (errorBundlePretty err)
-
-test11 :: IO ()
-test11 = do
-    let input = "if (1) { return 0; }"
-        result = runParserT jsStatem "" input
-        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 1, scopePos = 0, currentFuncName = "foo" })
-    if isRight result'
-    then do
-        let (Right result2) = result'
-        if (IfStatem (IntExpr 1) (BlockStatem (ReturnStatem (Just (IntExpr 0))) EmptyStatem)) == result2
-        then
-            putStrLn ("Test 11 succeeded.")
-        else
-            putStrLn ("Test 11 failed.")
-    else
-        let (Left err) = result' in putStrLn (errorBundlePretty err)
 
 test12 :: IO ()
 test12 = do
@@ -170,10 +105,10 @@ main = do
     test05 -- Expr
     test06
     test07
-    test08
-    test09
-    test10
-    test11
+    test08 -- Statem
+    test09 -- Statem
+    test10 -- Statem
+    test11 -- Statem
     test12
     test13
     test14
@@ -185,3 +120,5 @@ main = do
     test20 -- VarDeclare
     test21 -- VarDeclare
     test22 -- Expr
+    test23 -- VarDeclares
+    test24 -- Statem

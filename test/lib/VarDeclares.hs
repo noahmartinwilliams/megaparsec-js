@@ -114,3 +114,14 @@ test21 = do
             putStrLn ("Test 21 failed. Got: " ++ (show result''))
     else
         let (Left err) = result' in putStrLn (errorBundlePretty err)
+
+test23 :: IO ()
+test23 = do
+    let input = "var _sf_startpt=(new Date()).getTime();"
+        result = runParserT jsStatem "" input
+        (result', _) = runState result jsInitialState 
+    case result' of
+        (Right (VarDeclareStatem [(LocalVar {varPath = [0], varFunctionName = "", varName = "_sf_startpt", varScopeLevel = 1, varScopePos = 0},Just _ )])) ->
+            putStrLn ("Test 23 succeeded.")
+        (Left err) -> putStrLn (errorBundlePretty err)
+        (Right r) -> putStrLn ("Test 23 failed. Got: " ++ (show r))
