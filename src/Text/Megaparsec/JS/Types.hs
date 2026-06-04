@@ -13,7 +13,7 @@ data Variable = UnknownVar String |
     GlobalVar {gvVarName :: String, gvMethods :: [(String, Int)]} | 
     LocalVar { varPath :: [Int], varFunctionName :: String, varName :: String, varScopeLevel :: Int, varScopePos :: Int} deriving(Show, Eq)
 
-data BinOp = EqualityBinOp | MemAccBinOp | AssignBinOp | AddBinOp | SubBinOp | MulBinOp | DivBinOp deriving(Show, Eq)
+data BinOp = EqualityBinOp | MemAccBinOp | AssignBinOp | AddBinOp | SubBinOp | MulBinOp | DivBinOp | LogAndBinOp deriving(Show, Eq)
 
 data Expr = BoolExpr Bool | 
     TernaryExpr Expr Expr Expr | 

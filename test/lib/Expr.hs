@@ -136,3 +136,17 @@ test22 = do
             putStrLn ("Test 22 failed. Got: \"" ++ (show result') ++ "\".")
     else
         let (Left err) = result' in putStrLn (errorBundlePretty err)
+
+test25 :: IO ()
+test25 = do
+    let input = "(x == 1) && (y == 2)"
+        result = runParserT jsExpr "" input
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = "" })
+    case result' of
+        (Right result'') -> do
+            if result'' == (BinOpExpr (BinOpExpr (VarExpr (UnknownVar "x")) (IntExpr 1) EqualityBinOp) (BinOpExpr (VarExpr (UnknownVar "y")) (IntExpr 2) EqualityBinOp) LogAndBinOp)
+            then
+                putStrLn ("Test 25 succeeded.")
+            else
+                putStrLn ("Test 25 failed. Got: \"" ++ (show result') ++ "\".")
+        (Left err) -> putStrLn (errorBundlePretty err)

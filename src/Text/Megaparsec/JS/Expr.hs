@@ -3,7 +3,6 @@ module Text.Megaparsec.JS.Expr where
 import Control.Monad
 import Control.Monad.State
 import Control.Monad.Combinators.Expr
-import Data.Void
 import Text.Megaparsec.JS.Ident
 import Text.Megaparsec
 import Text.Megaparsec.Char as C
@@ -58,6 +57,9 @@ mkMemAccExpr e1 e2 = BinOpExpr e1 e2 MemAccBinOp
 mkEqualityExpr :: Expr -> Expr -> Expr
 mkEqualityExpr e1 e2 = BinOpExpr e1 e2 EqualityBinOp
 
+mkLogAndExpr :: Expr -> Expr -> Expr
+mkLogAndExpr e1 e2 = BinOpExpr e1 e2 LogAndBinOp
+
 parens :: JSParser a -> JSParser a
 parens x = do
     scn1 $ between (string "(") (string ")") x
@@ -107,7 +109,15 @@ jsExprOp = do
     let binary name f = InfixL (f <$ symbol lscn1 name)
         postfix p = Postfix p
         prefix p = Prefix p
-        table = [ [postfix funcCallExpr], [Prefix (newExpr <$ symbol lscn1 "new")] , [binary "*" mkMulExpr, binary "/" mkDivExpr], [binary "+" mkAddExpr, binary "-" mkSubExpr], [binary "==" mkEqualityExpr], [binary "=" mkAssignExpr], [TernR (jsTernary <$ scn1 (single '?'))], [binary "." mkMemAccExpr] ]
+        table = [ [postfix funcCallExpr], 
+            [Prefix (newExpr <$ symbol lscn1 "new")] , 
+            [binary "*" mkMulExpr, binary "/" mkDivExpr], 
+            [binary "+" mkAddExpr, binary "-" mkSubExpr], 
+            [binary "==" mkEqualityExpr], 
+            [binary "&&" mkLogAndExpr],
+            [binary "=" mkAssignExpr], 
+            [TernR (jsTernary <$ scn1 (single '?'))], 
+            [binary "." mkMemAccExpr] ]
         terms = (jsExprBool <|> jsAnonFuncExpr <|> (parens jsExprOp) <|> jsStringLit <|> jsExprInt <|> jsExprVar)
     makeExprParser terms table <?> "expression"
 

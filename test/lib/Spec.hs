@@ -122,3 +122,4 @@ main = do
     test22 -- Expr
     test23 -- VarDeclares
     test24 -- Statem
+    test25 -- Expr
