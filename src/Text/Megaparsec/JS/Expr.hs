@@ -55,6 +55,9 @@ funcCallExpr = do
 newExpr :: (Expr -> Expr)
 newExpr = (\x -> NewExpr x)
     
+typeofExpr :: (Expr -> Expr)
+typeofExpr = (\x -> TypeOfExpr x)
+
 jsAnonFuncExpr1 :: JSParser Expr 
 jsAnonFuncExpr1 = do
     void $ scn1 (string "function")
@@ -89,6 +92,7 @@ jsExprOp = do
         prefix p = Prefix p
         table = [ [postfix funcCallExpr], 
             [Prefix (newExpr <$ symbol lscn1 "new")] , 
+            [Prefix (typeofExpr <$ symbol lscn1 "typeof")],
             [binary "*" mkMulExpr, binary "/" mkDivExpr], 
             [binary "+" mkAddExpr, binary "-" mkSubExpr], 
             [binary "==" mkEqualityExpr, binary "!==" mkStrictInequalityExpr ], 
@@ -96,10 +100,10 @@ jsExprOp = do
             [binary "=" mkAssignExpr], 
             [TernR (jsTernary <$ scn1 (single '?'))], 
             [binary "." mkMemAccExpr] ]
-        terms = (jsExprBool <|> jsAnonFuncExpr <|> (parens jsExprOp) <|> jsStringLit <|> jsExprInt <|> jsExprVar)
+        terms = (jsJSON <|> jsExprBool <|> jsAnonFuncExpr <|> (parens jsExprOp) <|> jsStringLit <|> jsExprInt <|> jsExprVar)
     makeExprParser terms table <?> "expression"
 
 jsExpr :: JSParser Expr 
 jsExpr = do
-    e <- (try jsJSON <|> try jsExprOp <|> try jsAnonFuncExpr <|> try jsStringLit <|> try jsExprInt <|> try jsExprVar )
+    e <- (try jsExprOp <|> try jsAnonFuncExpr <|> try jsStringLit <|> try jsExprInt <|> try jsExprVar )
     return e

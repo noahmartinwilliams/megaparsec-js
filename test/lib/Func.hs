@@ -63,3 +63,19 @@ test16 = do
             else
                 putStrLn ("Test 16 failed.")
         (Left err) -> putStrLn (errorBundlePretty err)
+
+test27 :: IO ()
+test27 = do
+    let input = "(function () { return 1; }());"
+        result = runParserT jsDoc "" input
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = "" })
+    case result' of
+        (Right ((Doc syms), _)) -> do
+            if (syms !! 0) == DocStatems (BlockStatem (ExprStatem (FuncCallExpr (AnonFuncExpr [] (BlockStatem (ReturnStatem (Just (IntExpr 1))) EmptyStatem)) [])) EmptyStatem)
+            then
+                putStrLn ("Test 27 succeeded.")
+            else
+                putStrLn ("Test 27 failed. Got: " ++ (show result'))
+        (Left err) -> putStrLn (errorBundlePretty err)
+
+

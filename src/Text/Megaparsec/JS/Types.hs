@@ -28,6 +28,7 @@ data Expr = BoolExpr Bool |
     AnonFuncExpr [Variable] Statem | 
     FuncCallExpr Expr [Expr] | 
     NewExpr Expr |
+    TypeOfExpr Expr |
     BinOpExpr Expr Expr BinOp | 
     VarExpr Variable | 
     IntExpr Int | 

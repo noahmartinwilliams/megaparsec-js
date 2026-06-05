@@ -62,3 +62,4 @@ main = do
     test24 -- Statem
     test25 -- Expr
     test26 -- Expr
+    test27 -- Func
