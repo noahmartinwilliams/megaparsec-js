@@ -32,6 +32,8 @@ library
       Text.Megaparsec.JS.Func
       Text.Megaparsec.JS.Ident
       Text.Megaparsec.JS.JSON
+      Text.Megaparsec.JS.List
+      Text.Megaparsec.JS.Misc
       Text.Megaparsec.JS.Space
       Text.Megaparsec.JS.Statem
       Text.Megaparsec.JS.String
@@ -59,6 +61,7 @@ test-suite libTest
   other-modules:
       Expr
       Func
+      List
       Statem
       VarDeclares
       Paths_megaparsec_js
