@@ -3,6 +3,7 @@ module Text.Megaparsec.JS.Expr where
 import Control.Monad
 import Control.Monad.State
 import Control.Monad.Combinators.Expr
+import Text.Megaparsec.JS.BinExpr
 import Text.Megaparsec.JS.Ident
 import Text.Megaparsec
 import Text.Megaparsec.Char as C
@@ -36,29 +37,6 @@ jsExprBool = do
     else 
         return (BoolExpr False)
 
-mkMulExpr :: Expr -> Expr -> Expr
-mkMulExpr e1 e2 = BinOpExpr e1 e2 MulBinOp
-
-mkDivExpr :: Expr -> Expr -> Expr
-mkDivExpr e1 e2 = BinOpExpr e1 e2 DivBinOp
-
-mkAddExpr :: Expr -> Expr -> Expr
-mkAddExpr e1 e2 = BinOpExpr e1 e2 AddBinOp
-
-mkSubExpr :: Expr -> Expr -> Expr
-mkSubExpr e1 e2 = BinOpExpr e1 e2 SubBinOp
-
-mkAssignExpr :: Expr -> Expr -> Expr
-mkAssignExpr e1 e2 = BinOpExpr e1 e2 AssignBinOp
-
-mkMemAccExpr :: Expr -> Expr -> Expr
-mkMemAccExpr e1 e2 = BinOpExpr e1 e2 MemAccBinOp
-
-mkEqualityExpr :: Expr -> Expr -> Expr
-mkEqualityExpr e1 e2 = BinOpExpr e1 e2 EqualityBinOp
-
-mkLogAndExpr :: Expr -> Expr -> Expr
-mkLogAndExpr e1 e2 = BinOpExpr e1 e2 LogAndBinOp
 
 parens :: JSParser a -> JSParser a
 parens x = do
@@ -113,7 +91,7 @@ jsExprOp = do
             [Prefix (newExpr <$ symbol lscn1 "new")] , 
             [binary "*" mkMulExpr, binary "/" mkDivExpr], 
             [binary "+" mkAddExpr, binary "-" mkSubExpr], 
-            [binary "==" mkEqualityExpr], 
+            [binary "==" mkEqualityExpr, binary "!==" mkStrictInequalityExpr ], 
             [binary "&&" mkLogAndExpr],
             [binary "=" mkAssignExpr], 
             [TernR (jsTernary <$ scn1 (single '?'))], 

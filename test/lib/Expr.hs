@@ -150,3 +150,17 @@ test25 = do
             else
                 putStrLn ("Test 25 failed. Got: \"" ++ (show result') ++ "\".")
         (Left err) -> putStrLn (errorBundlePretty err)
+
+test26 :: IO ()
+test26 = do
+    let input = "(x == 1) !== 1"
+        result = runParserT jsExpr "" input
+        (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = "" })
+    case result' of
+        (Right result'') -> do
+            if result'' == (BinOpExpr (BinOpExpr (VarExpr (UnknownVar "x")) (IntExpr 1) EqualityBinOp) (IntExpr 1) StrictInequalityBinOp)
+            then
+                putStrLn ("Test 26 succeeded.")
+            else
+                putStrLn ("Test 26 failed. Got: \"" ++ (show result') ++ "\".")
+        (Left err) -> putStrLn (errorBundlePretty err)

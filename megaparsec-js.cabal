@@ -26,6 +26,7 @@ source-repository head
 library
   exposed-modules:
       Text.Megaparsec.JS
+      Text.Megaparsec.JS.BinExpr
       Text.Megaparsec.JS.Doc
       Text.Megaparsec.JS.Expr
       Text.Megaparsec.JS.Func
@@ -57,6 +58,7 @@ test-suite libTest
   main-is: Spec.hs
   other-modules:
       Expr
+      Func
       Statem
       VarDeclares
       Paths_megaparsec_js
