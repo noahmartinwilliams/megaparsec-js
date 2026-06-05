@@ -35,6 +35,7 @@ data Expr = BoolExpr Bool |
     IntExpr Int | 
     StringLitExpr String | 
     FuncExpr Funct | 
+    ListLitExpr [Expr] |
     ObjExpr (Map String Expr) deriving(Show, Eq)
 
 data Statem = IfStatem Expr Statem | EmptyStatem | BlockStatem Statem Statem | WhileStatem Expr Statem | ReturnStatem (Maybe Expr) | VarDeclareStatem [(Variable, Maybe Expr)] | ExprStatem Expr deriving(Show, Eq)

@@ -3,13 +3,15 @@ module Text.Megaparsec.JS.Expr where
 import Control.Monad
 import Control.Monad.State
 import Control.Monad.Combinators.Expr
-import Text.Megaparsec.JS.BinExpr
-import Text.Megaparsec.JS.Ident
 import Text.Megaparsec
 import Text.Megaparsec.Char as C
 import Text.Megaparsec.Char.Lexer as L
+import Text.Megaparsec.JS.BinExpr
 import {-# SOURCE #-} Text.Megaparsec.JS.Func
+import Text.Megaparsec.JS.Ident
 import {-# SOURCE #-} Text.Megaparsec.JS.JSON
+import {-# SOURCE #-} Text.Megaparsec.JS.List
+import Text.Megaparsec.JS.Misc
 import Text.Megaparsec.JS.Space
 import {-# SOURCE #-} Text.Megaparsec.JS.Statem 
 import Text.Megaparsec.JS.String
@@ -36,16 +38,6 @@ jsExprBool = do
         return (BoolExpr True)
     else 
         return (BoolExpr False)
-
-
-parens :: JSParser a -> JSParser a
-parens x = do
-    scn1 $ between (string "(") (string ")") x
-
-comma :: JSParser ()
-comma = do
-    void $ scn1 (single ',')
-    return ()
 
 funcCallExpr :: JSParser (Expr -> Expr)
 funcCallExpr = do
@@ -101,7 +93,7 @@ jsExprOp = do
             [binary "=" mkAssignExpr], 
             [TernR (jsTernary <$ scn1 (single '?'))], 
             [binary "." mkMemAccExpr] ]
-        terms = (jsJSON <|> jsExprBool <|> jsAnonFuncExpr <|> (parens jsExprOp) <|> jsStringLit <|> jsExprInt <|> jsExprVar)
+        terms = (jsListLit <|> jsJSON <|> jsExprBool <|> jsAnonFuncExpr <|> (parens jsExprOp) <|> jsStringLit <|> jsExprInt <|> jsExprVar)
     makeExprParser terms table <?> "expression"
 
 jsExpr :: JSParser Expr 

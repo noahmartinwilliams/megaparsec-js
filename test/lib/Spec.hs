@@ -6,6 +6,7 @@ import Data.Either
 import Data.Map
 import Expr
 import Func
+import List
 import Statem
 import Text.Megaparsec
 import Text.Megaparsec.JS.Doc
@@ -41,15 +42,15 @@ main = do
     test03 -- VarDeclare
     test04
     test05 -- Expr
-    test06
-    test07
+    test06 -- Expr
+    test07 -- Expr
     test08 -- Statem
     test09 -- Statem
     test10 -- Statem
     test11 -- Statem
     test12 -- Func
     test13 -- Func
-    test14
+    test14 -- Expr
     test15 -- Func
     test16 -- Func
     test17
@@ -63,3 +64,4 @@ main = do
     test25 -- Expr
     test26 -- Expr
     test27 -- Func
+    test28 -- List

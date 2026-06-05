@@ -3,7 +3,6 @@ module Text.Megaparsec.JS.Ident(jsIdent) where
 import Control.Monad
 import Data.Set as Set
 import Data.Text as T
-import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char
 import Text.Megaparsec.Char.Lexer
