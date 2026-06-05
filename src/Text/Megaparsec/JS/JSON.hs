@@ -9,11 +9,20 @@ import Text.Megaparsec.JS.Space as S
 import Text.Megaparsec.JS.String
 import Text.Megaparsec.JS.Types
 
-jsJSON = do
+jsJSON1 :: JSParser Expr
+jsJSON1 = do
     void $ scn1 (single '{')
     entries <- jsJSONEntries
     void $ scn1 (single '}')
     return (ObjExpr (Data.Map.fromList entries))
+
+jsJSON2 :: JSParser Expr
+jsJSON2 = do
+    void $ scn1 (single '{')
+    void $ scn1 (single '}')
+    return (ObjExpr (Data.Map.empty))
+
+jsJSON = (try jsJSON2 <|> try jsJSON1)
 
 jsJSONEntries :: JSParser [(String, Expr)]
 jsJSONEntries = do
