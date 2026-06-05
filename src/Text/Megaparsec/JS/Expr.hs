@@ -49,7 +49,7 @@ comma = do
 
 funcCallExpr :: JSParser (Expr -> Expr)
 funcCallExpr = do
-    args <- parens ((scn1 jsExpr) `sepBy` comma)
+    args <- parens ((scn1 jsExpr) `sepBy` (scn1 comma))
     return (`FuncCallExpr` args)
 
 newExpr :: (Expr -> Expr)
@@ -97,6 +97,7 @@ jsExprOp = do
             [binary "+" mkAddExpr, binary "-" mkSubExpr], 
             [binary "==" mkEqualityExpr, binary "!==" mkStrictInequalityExpr ], 
             [binary "&&" mkLogAndExpr],
+            [binary "||" mkLogOrExpr],
             [binary "=" mkAssignExpr], 
             [TernR (jsTernary <$ scn1 (single '?'))], 
             [binary "." mkMemAccExpr] ]
@@ -105,5 +106,5 @@ jsExprOp = do
 
 jsExpr :: JSParser Expr 
 jsExpr = do
-    e <- (try jsExprOp <|> try jsAnonFuncExpr <|> try jsStringLit <|> try jsExprInt <|> try jsExprVar )
+    e <- scn1 (try jsExprOp <|> try jsAnonFuncExpr <|> try jsStringLit <|> try jsExprInt <|> try jsExprVar )
     return e

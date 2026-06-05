@@ -26,5 +26,8 @@ mkEqualityExpr e1 e2 = BinOpExpr e1 e2 EqualityBinOp
 mkLogAndExpr :: Expr -> Expr -> Expr
 mkLogAndExpr e1 e2 = BinOpExpr e1 e2 LogAndBinOp
 
+mkLogOrExpr :: Expr -> Expr -> Expr
+mkLogOrExpr e1 e2 = BinOpExpr e1 e2 LogOrBinOp
+
 mkStrictInequalityExpr :: Expr -> Expr -> Expr
 mkStrictInequalityExpr e1 e2 = BinOpExpr e1 e2 StrictInequalityBinOp
