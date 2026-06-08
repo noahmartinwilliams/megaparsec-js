@@ -15,8 +15,8 @@ keywords = do
 
 ident :: JSParser String
 ident = do
-    fchar <- (letterChar <|> (single '_'))
-    rest <- many (alphaNumChar <|> (single '_'))
+    fchar <- (letterChar <|> (single '_') <|> (single '$'))
+    rest <- many (alphaNumChar <|> (single '_') <|> (single '$'))
     return ([fchar] ++ rest)
 
 -- Special thanks to ChatGPT for helping with this.
