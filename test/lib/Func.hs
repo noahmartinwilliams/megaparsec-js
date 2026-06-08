@@ -39,7 +39,7 @@ test13 = do
 test15 :: IO ()
 test15 = do
     let input = "function f(a) { return a + 1; } var v ;"
-        result = runParserT jsDoc "" input
+        result = runParserT (jsDoc False) "" input
         (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = "" })
     case result' of
         (Right ((Doc syms), _)) -> do
@@ -53,7 +53,7 @@ test15 = do
 test16 :: IO ()
 test16 = do
     let input = "function f(a) { return function(b) { return a + b; } ; }  var v ;"
-        result = runParserT jsDoc "" input
+        result = runParserT (jsDoc False) "" input
         (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = "" })
     case result' of
         (Right ((Doc syms), _)) -> do
@@ -67,7 +67,7 @@ test16 = do
 test27 :: IO ()
 test27 = do
     let input = "(function () { return 1; }());"
-        result = runParserT jsDoc "" input
+        result = runParserT (jsDoc False) "" input
         (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = "" })
     case result' of
         (Right ((Doc syms), _)) -> do

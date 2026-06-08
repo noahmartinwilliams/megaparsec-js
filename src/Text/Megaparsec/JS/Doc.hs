@@ -33,12 +33,20 @@ lineComment = do
     void $ manyTill L.charLiteral (single '\n')
     return ()
 
-jsDoc :: JSParser (Doc, Text.Megaparsec.State String Void)
-jsDoc = do
+jsDoc :: Bool -> JSParser (Doc, Text.Megaparsec.State String Void)
+jsDoc False = do
     void $ optional (lineComment)
     syms <- scn1 (many (try jsDocFunc <|> try jsDocStatems))
     void $ optional (single '\n')
     void $ optional (lineComment)
+    st <- getParserState
+    return ((Doc syms), st)
+jsDoc True = do
+    void $ optional (lineComment)
+    syms <- scn1 (many (try jsDocFunc <|> try jsDocStatems))
+    void $ optional (single '\n')
+    void $ optional (lineComment)
+    void $ string "</script>"
     st <- getParserState
     return ((Doc syms), st)
 
