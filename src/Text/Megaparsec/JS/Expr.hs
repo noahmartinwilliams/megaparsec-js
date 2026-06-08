@@ -87,6 +87,7 @@ jsExprOp = do
             [Prefix (typeofExpr <$ symbol lscn1 "typeof")],
             [binary "*" mkMulExpr, binary "/" mkDivExpr], 
             [binary "+" mkAddExpr, binary "-" mkSubExpr], 
+            [binary "<" mkLTExpr],
             [binary "==" mkEqualityExpr, binary "!==" mkStrictInequalityExpr ], 
             [binary "&&" mkLogAndExpr],
             [binary "||" mkLogOrExpr],

@@ -40,7 +40,7 @@ main = do
     test01
     test02
     test03 -- VarDeclare
-    test04
+    test04 -- Expr
     test05 -- Expr
     test06 -- Expr
     test07 -- Expr

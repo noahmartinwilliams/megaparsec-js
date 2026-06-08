@@ -1,7 +1,6 @@
 module Expr where
 
 import Control.Monad.State
-import Data.Either
 import Data.Map
 import Text.Megaparsec
 import Text.Megaparsec.JS.Doc
@@ -101,30 +100,21 @@ test18 = do
     let input = "1 == 2"
         result = runParserT jsExpr "" input
         (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = "" })
-    if isRight result'
-    then do
-        if (Right (BinOpExpr (IntExpr 1) (IntExpr 2) EqualityBinOp)) == result'
-        then
-            putStrLn ("Test 18 succeeded.")
-        else
-            putStrLn ("Test 18 failed.")
-    else
-        let (Left err) = result' in putStrLn (errorBundlePretty err)
+    case result' of
+        (Right (BinOpExpr (IntExpr 1) (IntExpr 2) EqualityBinOp)) ->
+                putStrLn ("Test 18 succeeded.")
+        (Left err) -> putStrLn (errorBundlePretty err)
+        _ -> putStrLn ("Test 18 failed.")
 
 test22 :: IO ()
 test22 = do
     let input = "new Date()"
         result = runParserT jsExpr "" input
         (result', newState) = runState result (ParserState { scopePath = [1], variables = Data.Map.empty, scopeLevel = 0, scopePos = 0, currentFuncName = "" })
-    if isRight result'
-    then do
-        if result' == (Right (NewExpr (FuncCallExpr (VarExpr (UnknownVar "Date")) [])))
-        then
-            putStrLn ("Test 22 succeeded.")
-        else
-            putStrLn ("Test 22 failed. Got: \"" ++ (show result') ++ "\".")
-    else
-        let (Left err) = result' in putStrLn (errorBundlePretty err)
+    case result' of
+        (Right (NewExpr (FuncCallExpr (VarExpr (UnknownVar "Date")) []))) -> putStrLn ("Test 22 succeeded.")
+        (Left err) -> putStrLn (errorBundlePretty err)
+        _ -> putStrLn ("Test 22 failed. Got: \"" ++ (show result') ++ "\".")
 
 test25 :: IO ()
 test25 = do

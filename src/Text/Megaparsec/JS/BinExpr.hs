@@ -31,3 +31,6 @@ mkLogOrExpr e1 e2 = BinOpExpr e1 e2 LogOrBinOp
 
 mkStrictInequalityExpr :: Expr -> Expr -> Expr
 mkStrictInequalityExpr e1 e2 = BinOpExpr e1 e2 StrictInequalityBinOp
+
+mkLTExpr :: Expr -> Expr -> Expr
+mkLTExpr e1 e2 = BinOpExpr e1 e2 LTBinOp

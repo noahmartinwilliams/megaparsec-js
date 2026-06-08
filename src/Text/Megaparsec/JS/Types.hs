@@ -20,6 +20,7 @@ data BinOp = EqualityBinOp |
     SubBinOp | 
     MulBinOp | 
     DivBinOp | 
+    LTBinOp |
     LogAndBinOp |
     LogOrBinOp | 
     StrictInequalityBinOp deriving(Show, Eq)
