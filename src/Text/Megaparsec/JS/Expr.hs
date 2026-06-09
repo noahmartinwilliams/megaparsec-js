@@ -12,6 +12,7 @@ import Text.Megaparsec.JS.Ident
 import {-# SOURCE #-} Text.Megaparsec.JS.JSON
 import {-# SOURCE #-} Text.Megaparsec.JS.List
 import Text.Megaparsec.JS.Misc
+import Text.Megaparsec.JS.Regexp
 import Text.Megaparsec.JS.Space
 import {-# SOURCE #-} Text.Megaparsec.JS.Statem 
 import Text.Megaparsec.JS.String
@@ -94,7 +95,7 @@ jsExprOp = do
             [binary "||" mkLogOrExpr],
             [binary "=" mkAssignExpr], 
             [TernR (jsTernary <$ scn1 (single '?'))]]
-        terms = (jsListLit <|> jsJSON <|> jsExprBool <|> jsAnonFuncExpr <|> (parens jsExprOp) <|> jsExprInt <|> jsExprVar <|> jsStringLit)
+        terms = (jsRegexpExpr <|> jsListLit <|> jsJSON <|> jsExprBool <|> jsAnonFuncExpr <|> (parens jsExprOp) <|> jsExprInt <|> jsExprVar <|> jsStringLit)
     makeExprParser terms table <?> "expression"
 
 jsExpr :: JSParser Expr 
