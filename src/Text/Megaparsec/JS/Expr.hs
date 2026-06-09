@@ -90,7 +90,7 @@ jsExprOp = do
             [binary "*" mkMulExpr, binary "/" mkDivExpr], 
             [binary "+" mkAddExpr, binary "-" mkSubExpr], 
             [binary "<" mkLTExpr, binary ">" mkGTExpr],
-            [binary "==" mkEqualityExpr, binary "!==" mkStrictInequalityExpr ], 
+            [binary "===" mkStrictEqualityExpr, binary "==" mkEqualityExpr, binary "!==" mkStrictInequalityExpr ], 
             [binary "&&" mkLogAndExpr],
             [binary "||" mkLogOrExpr],
             [binary "=" mkAssignExpr], 

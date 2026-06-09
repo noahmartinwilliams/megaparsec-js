@@ -24,7 +24,8 @@ data BinOp = EqualityBinOp |
     GTBinOp | 
     LogAndBinOp |
     LogOrBinOp | 
-    StrictInequalityBinOp deriving(Show, Eq)
+    StrictInequalityBinOp |
+    StrictEqualityBinOp deriving(Show, Eq)
 
 data Expr = BoolExpr Bool | 
     TernaryExpr Expr Expr Expr | 
