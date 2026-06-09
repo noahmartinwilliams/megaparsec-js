@@ -30,7 +30,7 @@ jsFunc = do
     return (Funct funcName args s)
 
 jsArg1 = do
-    a <- jsArg
+    a <- scn1 jsArg
     return [a]
 
 comma :: JSParser ()

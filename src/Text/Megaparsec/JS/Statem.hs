@@ -56,14 +56,13 @@ jsBlockStatem = do
     void $ scn1 (single '{')
     pstate@(ParserState { scopePath = spath, scopeLevel = slevel, scopePos = spos}) <- get
     put (pstate { scopePath = (spos : spath), scopeLevel = (slevel + 1), scopePos = (spos + 1)})
-    ss <- scn1 (many jsStatem)
-    let folded = Prelude.foldr (BlockStatem) EmptyStatem ss
+    ss <- scn1 jsStatems
     void $ scn1 (single '}')
     put (pstate { scopePath = spath, scopeLevel = slevel})
-    return folded
+    return ss
 
 jsStatems = do
-    ss <- some (jsStatem)
+    ss <- some (scn1 jsStatem)
     return (Prelude.foldr BlockStatem EmptyStatem ss)
 
 jsVarDeclareStatem :: JSParser Statem

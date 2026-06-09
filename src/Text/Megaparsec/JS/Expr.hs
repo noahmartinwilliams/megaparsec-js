@@ -41,7 +41,7 @@ jsExprBool = do
 
 funcCallExpr :: JSParser (Expr -> Expr)
 funcCallExpr = do
-    args <- parens ((scn1 jsExpr) `sepBy` (scn1 comma))
+    args <- scn1 (parens ((scn1 jsExpr) `sepBy` (scn1 comma)))
     return (`FuncCallExpr` args)
 
 newExpr :: (Expr -> Expr)
@@ -57,7 +57,7 @@ jsAnonFuncExpr1 = do
     void $ scn1 (single '(')
     args <- scn1 (jsArg1)
     void $ scn1 (single ')')
-    statems <- jsBlockStatem
+    statems <- scn1 jsBlockStatem
     return (AnonFuncExpr args statems)
 
 jsAnonFuncExpr2 :: JSParser Expr
@@ -82,22 +82,20 @@ jsExprOp = do
     let binary name f = InfixL (f <$ symbol lscn1 name)
         postfix p = Postfix p
         prefix p = Prefix p
-        table = [ [postfix funcCallExpr], 
+        table = [ [binary "." mkMemAccExpr],
+            [postfix funcCallExpr], 
             [Prefix (newExpr <$ symbol lscn1 "new")] , 
             [Prefix (typeofExpr <$ symbol lscn1 "typeof")],
             [binary "*" mkMulExpr, binary "/" mkDivExpr], 
             [binary "+" mkAddExpr, binary "-" mkSubExpr], 
-            [binary "<" mkLTExpr],
+            [binary "<" mkLTExpr, binary ">" mkGTExpr],
             [binary "==" mkEqualityExpr, binary "!==" mkStrictInequalityExpr ], 
             [binary "&&" mkLogAndExpr],
             [binary "||" mkLogOrExpr],
             [binary "=" mkAssignExpr], 
-            [TernR (jsTernary <$ scn1 (single '?'))], 
-            [binary "." mkMemAccExpr] ]
-        terms = (jsListLit <|> jsJSON <|> jsExprBool <|> jsAnonFuncExpr <|> (parens jsExprOp) <|> jsStringLit <|> jsExprInt <|> jsExprVar)
+            [TernR (jsTernary <$ scn1 (single '?'))]]
+        terms = (jsListLit <|> jsJSON <|> jsExprBool <|> jsAnonFuncExpr <|> (parens jsExprOp) <|> jsExprInt <|> jsExprVar <|> jsStringLit)
     makeExprParser terms table <?> "expression"
 
 jsExpr :: JSParser Expr 
-jsExpr = do
-    e <- scn1 (try jsExprOp <|> try jsAnonFuncExpr <|> try jsStringLit <|> try jsExprInt <|> try jsExprVar )
-    return e
+jsExpr = jsExprOp
