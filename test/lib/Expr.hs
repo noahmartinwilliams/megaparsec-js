@@ -143,3 +143,5 @@ test26 = do
             else
                 putStrLn ("Test 26 failed. Got: \"" ++ (show result') ++ "\".")
         (Left err) -> putStrLn (errorBundlePretty err)
+
+

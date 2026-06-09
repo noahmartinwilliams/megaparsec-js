@@ -57,7 +57,7 @@ main = do
     test18 -- Expr
     test19
     test20 -- VarDeclare
-    test21 -- VarDeclare
+    test21 -- Statem
     test22 -- Expr
     test23 -- VarDeclares
     test24 -- Statem

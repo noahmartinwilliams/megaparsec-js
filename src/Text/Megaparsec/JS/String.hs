@@ -15,9 +15,15 @@ jsStringLit1 = do
 
 jsStringLit2 :: JSParser Expr
 jsStringLit2 = do
-    void $ (single '\'')
-    content <- scn1 (manyTill (char '\\' *> char '\'' <|> noneOf "'") (char '\''))
-    return (StringLitExpr content)
+    str <- scn1 (char '\'' *> manyTill charInString (char '\''))
+    return (StringLitExpr str) where
+        charInString = (char '\\' *> escapedChar) <|> satisfy (/= '\'')
+        escapedChar =
+            (char 'n' >> return '\n') <|>
+            (char 't' >> return '\t') <|>
+            (char '\'' >> return '\'' ) <|>
+            (char '\\' >> return '\\')
+
 
 jsStringLit :: JSParser Expr
-jsStringLit = (jsStringLit1 <|> jsStringLit2)
+jsStringLit = (try jsStringLit1 <|> try jsStringLit2)

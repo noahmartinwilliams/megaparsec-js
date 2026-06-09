@@ -98,22 +98,6 @@ test20 = do
     else
         let (Left err) = result' in putStrLn (errorBundlePretty err)
 
-test21 :: IO ()
-test21 = do
-    let input = "document.write(\"screw html >:c\");"
-        result = runParserT jsStatem "" input
-        (result', _) = runState result jsInitialState 
-        correctAnswer = ExprStatem (BinOpExpr (VarExpr (GlobalVar {gvVarName = "document", gvMethods = [("write",1)]})) (FuncCallExpr (VarExpr (UnknownVar "write")) [StringLitExpr "screw html >:c"]) MemAccBinOp)
-    if isRight result'
-    then do
-        let (Right result'') = result'
-        if result'' == correctAnswer
-        then
-            putStrLn "Test 21 succeeded."
-        else
-            putStrLn ("Test 21 failed. Got: " ++ (show result''))
-    else
-        let (Left err) = result' in putStrLn (errorBundlePretty err)
 
 test23 :: IO ()
 test23 = do

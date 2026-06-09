@@ -4,6 +4,7 @@ import Control.Monad.State
 import Data.Either
 import Data.Map 
 import Text.Megaparsec
+import Text.Megaparsec.JS
 import Text.Megaparsec.JS.Statem
 import Text.Megaparsec.JS.Types
 
@@ -84,3 +85,20 @@ test24 = do
             else
                 putStrLn ("Test 24 failed.")
         (Left e) -> putStrLn (errorBundlePretty e)
+
+test21 :: IO ()
+test21 = do
+    let input = "document.write(\"screw html >:c\");"
+        result = runParserT jsStatem "" input
+        (result', _) = runState result jsInitialState 
+        correctAnswer = ExprStatem (FuncCallExpr (BinOpExpr (VarExpr (GlobalVar {gvVarName = "document", gvMethods = [("write",1)]})) (VarExpr (UnknownVar "write")) MemAccBinOp) [StringLitExpr "screw html >:c"])
+    if isRight result'
+    then do
+        let (Right result'') = result'
+        if result'' == correctAnswer
+        then
+            putStrLn "Test 21 succeeded."
+        else
+            putStrLn ("Test 21 failed. Got: " ++ (show result''))
+    else
+        let (Left err) = result' in putStrLn (errorBundlePretty err)
