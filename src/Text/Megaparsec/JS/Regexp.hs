@@ -11,7 +11,7 @@ jsRegexpExpr :: JSParser Expr
 jsRegexpExpr = do
     str <- scn1 (between (string "/") (string "/") (many character))
     void $ single 'i'
-    return (StringLitExpr (str ++ "i")) where
+    return (RegexpExpr (str ++ "i")) where
         
         character :: JSParser Char
         character = try escapedChar <|> normalChar

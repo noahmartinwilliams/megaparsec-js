@@ -3,6 +3,7 @@ module Text.Megaparsec.JS.Func where
 import Control.Monad
 import Control.Monad.State
 import Data.Map as M
+import Data.Maybe
 import Data.Text as T
 import Text.Megaparsec
 import Text.Megaparsec.Char
@@ -18,16 +19,17 @@ jsFunc = do
     funcName <- scn1 jsIdent
     put (pstate { currentFuncName = funcName } )
     void $ scn1 (single '(')
-    args <- scn1 (try (jsArgList <|> jsArg1))
+    args <- scn1 (optional (try (jsArgList <|> jsArg1)))
     void $ scn1 (single ')')
-    let newMapList = Prelude.zip (Prelude.map (\(LocalVar { varName = v}) -> v) args) (Prelude.map (\x -> [x]) args)
+    let args' = if isNothing args then [] else let (Just a) = args in a 
+        newMapList = Prelude.zip (Prelude.map (\(LocalVar { varName = v}) -> v) args') (Prelude.map (\x -> [x]) args')
         newMap = M.fromList newMapList
     put (pstate { scopePath = ((spos + 1) : spath), variables = (M.union vars newMap), scopeLevel = 1, scopePos = (spos + 1)})
     void $ scn1 (single '{')
     s <- scn1 jsStatems
     void $ scn1 (single '}')
     put (pstate { currentFuncName = "", scopePath = spath, variables = vars, scopeLevel = 0})
-    return (Funct funcName args s)
+    return (Funct funcName args' s)
 
 jsArg1 = do
     a <- scn1 jsArg

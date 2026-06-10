@@ -3,6 +3,8 @@ module Text.Megaparsec.JS.Statem where
 import Text.Megaparsec
 import Text.Megaparsec.Char.Lexer
 import Text.Megaparsec.Char
+import {-# SOURCE #-} Text.Megaparsec.JS.Func
+import Text.Megaparsec.JS.Ident
 import Text.Megaparsec.JS.Space
 import Text.Megaparsec.JS.Types 
 import Text.Megaparsec.JS.VarDeclaration
@@ -61,6 +63,19 @@ jsBlockStatem = do
     put (pstate { scopePath = spath, scopeLevel = slevel})
     return ss
 
+jsFuncStatem :: JSParser Statem
+jsFuncStatem = do
+    void $ scn1 (string "function")
+    name <- scn1 jsIdent
+    void $ scn1 (single '(')
+    args <- scn1 (optional jsArgList)
+    void $ scn1 (single ')')
+    st <- scn1 jsBlockStatem
+    void $ scn1 (single ';')
+    case args of
+        Nothing -> return (FuncStatem (Funct name [] st))
+        (Just a) -> return (FuncStatem (Funct name a st))
+
 jsStatems = do
     ss <- some (scn1 jsStatem)
     return (Prelude.foldr BlockStatem EmptyStatem ss)
@@ -69,7 +84,7 @@ jsVarDeclareStatem :: JSParser Statem
 jsVarDeclareStatem = jsVarDeclarationSimple
 
 jsStatem1 :: JSParser Statem
-jsStatem1 = (try jsVarDeclareStatem <|> try jsIfStatem <|> try jsBlockStatem <|> try jsWhileStatem <|> try jsReturnStatem <|> try jsExprStatem)
+jsStatem1 = (try jsFuncStatem <|> try jsVarDeclareStatem <|> try jsIfStatem <|> try jsBlockStatem <|> try jsWhileStatem <|> try jsReturnStatem <|> try jsExprStatem )
 
 jsStatem2 :: JSParser Statem
 jsStatem2 = do

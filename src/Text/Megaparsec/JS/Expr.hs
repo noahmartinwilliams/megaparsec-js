@@ -51,6 +51,9 @@ newExpr = (\x -> NewExpr x)
 typeofExpr :: (Expr -> Expr)
 typeofExpr = (\x -> TypeOfExpr x)
 
+logInvExpr :: (Expr -> Expr )
+logInvExpr = (\x -> LogInvertExpr x)
+
 jsAnonFuncExpr1 :: JSParser Expr 
 jsAnonFuncExpr1 = do
     void $ scn1 (string "function")
@@ -86,7 +89,7 @@ jsExprOp = do
         table = [ [binary "." mkMemAccExpr],
             [postfix funcCallExpr], 
             [Prefix (newExpr <$ symbol lscn1 "new")] , 
-            [Prefix (typeofExpr <$ symbol lscn1 "typeof")],
+            [Prefix (logInvExpr <$ symbol lscn1 "!"), Prefix (typeofExpr <$ symbol lscn1 "typeof")],
             [binary "*" mkMulExpr, binary "/" mkDivExpr], 
             [binary "+" mkAddExpr, binary "-" mkSubExpr], 
             [binary "<" mkLTExpr, binary ">" mkGTExpr],

@@ -40,9 +40,17 @@ data Expr = BoolExpr Bool |
     FuncExpr Funct | 
     ListLitExpr [Expr] |
     RegexpExpr String | 
+    LogInvertExpr Expr | 
     ObjExpr (Map String Expr) deriving(Show, Eq)
 
-data Statem = IfStatem Expr Statem | EmptyStatem | BlockStatem Statem Statem | WhileStatem Expr Statem | ReturnStatem (Maybe Expr) | VarDeclareStatem [(Variable, Maybe Expr)] | ExprStatem Expr deriving(Show, Eq)
+data Statem = IfStatem Expr Statem | 
+    EmptyStatem | 
+    BlockStatem Statem Statem | 
+    WhileStatem Expr Statem | 
+    ReturnStatem (Maybe Expr) | 
+    VarDeclareStatem [(Variable, Maybe Expr)] | 
+    ExprStatem Expr |
+    FuncStatem Funct deriving(Show, Eq)
 
 data Funct = DateFunct | Funct String [Variable] Statem  deriving(Show, Eq)
 

@@ -27,12 +27,6 @@ jsDocStatems = do
     s <- scn1 jsStatems
     return (DocStatems s)
 
-lineComment :: JSParser ()
-lineComment = do
-    void $ string "//"
-    void $ manyTill L.charLiteral (single '\n')
-    return ()
-
 jsDoc :: Bool -> JSParser (Doc, Text.Megaparsec.State String Void)
 jsDoc False = do
     syms <- scn1 (some (try jsDocFunc <|> try jsDocStatems))
